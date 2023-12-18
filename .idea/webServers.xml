@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="270d9a1c-6ea0-4fa6-ad2c-ca349337d10f" name="static-lite-server" url="http://localhost:7838">
+        <fileTransfer mountedRoot="$USER_HOME$/WebProjects/static-lite-server/public" accessType="MOUNT" port="0" />
+      </webServer>
+    </option>
+  </component>
+</project>

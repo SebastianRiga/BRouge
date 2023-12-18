@@ -1,0 +1,33 @@
+[package]
+name = "b_rouge"
+description = "The goal of this project is to create a classic rougelike inspired game in Rust using bevy."
+version = "0.1.5"
+edition = "2021"
+authors = ["Sebastian Riga"]
+categories = ["game-development", "games"]
+readme = "README.md"
+license-file = "LICENSE.md"
+rust-version = "1.71.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[dependencies]
+bevy = { version = "0.12.0", features = ["serialize"] }
+bevy_ascii_terminal = "0.14.0"
+
+serde = { version = "1.0.192", features = ["derive"] }
+serde_json = "1.0.108"
+
+strum = "0.25.0"
+strum_macros = "0.25.3"
+
+log = "0.4.20"
+web-sys = "0.3.66"
+wasm-logger = "0.2.0"
+wasm-bindgen = "0.2.89"
