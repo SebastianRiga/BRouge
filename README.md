@@ -1,8 +1,7 @@
 # BRouge
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-![Unit tests](https://github.com/SebastianRiga/BRouge/actions/workflows/rust.yml/badge.svg)
+![Tests](https://github.com/SebastianRiga/BRouge/actions/workflows/rust.yml/badge.svg)
 
 ## Prelude
 
