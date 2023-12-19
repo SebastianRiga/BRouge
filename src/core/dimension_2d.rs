@@ -208,6 +208,7 @@ mod tests {
         assert_eq!(4000, USIZE_ARRAY.area());
     }
 
+    //noinspection ALL
     #[test]
     fn test_array_conversion() {
         assert_eq!([80, 50], VEC2.as_array());

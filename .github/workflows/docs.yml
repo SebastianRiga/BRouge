@@ -47,7 +47,7 @@ jobs:
           name: docs
           path: './target/doc'
 
-  # Deploy to github pages
+  # Deploy to Github pages
   deploy-docs:
     needs: build-docs
     environment:

@@ -36,7 +36,7 @@ use bevy::app::Plugin;
 /// * [Plugin]
 ///
 pub trait PluginProvider<P> where P: Plugin {
-    /// Creates, configures and returns the [Plugin] of type [P], ready for registration with
+    /// Creates, configures and returns the [Plugin] of type `P`, ready for registration with
     /// the bevy ecs.
     ///
     /// # Examples

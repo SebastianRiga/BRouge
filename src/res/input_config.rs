@@ -155,7 +155,7 @@ pub enum InputType {
 }
 
 impl InputConfig {
-    /// Translates the passed [KeyCode] to its corresponding [InputEvent], which can then be
+    /// Translates the passed [KeyCode] to its corresponding [InputType], which can then be
     /// handled by different systems of the game.
     ///
     /// # Arguments

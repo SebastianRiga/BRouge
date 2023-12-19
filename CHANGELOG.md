@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Maintenance] Tue Dec 19 EST 2023
+
+* Cleaned up workflow files
+* Fixed documentation issues
+
 ## [0.1.6] Mon Dec 18 CET 2023
 
 Extended applicable implementations with unit tests.

@@ -1,19 +1,21 @@
-name: Unit tests
+# Workflow to run the game's unit tests
+name: Run unit tests
 
 on:
   push:
+    # Runs on pushes targeting the default branch
     branches: [ "main" ]
   pull_request:
+    # Runs on opening pull requests targeting the default branch
     branches: [ "main" ]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # Executes the unit tests
   test:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Install required system libraries

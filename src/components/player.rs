@@ -30,10 +30,10 @@ use bevy::prelude::Component;
 ///
 /// ```
 /// commands.spawn((
-///     Player, <---- The spawned `entity` will be the main actor of the game.
+///     Player, // The spawned `entity` will be the main actor of the game.
 ///     Coord2d::from_position(starting_position),
 ///     ascii_sprite!('@', Color::ORANGE, Color::BLACK)
-/// ))
+/// ));
 /// ```
 ///
 /// # About
@@ -41,6 +41,10 @@ use bevy::prelude::Component;
 /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
 ///
 /// Since: `0.1.5`
+///
+/// # See also
+///
+/// * [crate::entities::player_bundle::PlayerBundle]
 ///
 #[derive(Debug, Copy, Clone, Component)]
 pub struct Player;

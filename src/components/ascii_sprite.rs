@@ -105,7 +105,7 @@ impl AsciiSprite {
     ///
     /// # See also
     ///
-    /// * [ascii_sprite] macro
+    /// * `ascii_sprite` macro
     ///
     pub fn new(glyph: char, foreground_color: Color, background_color: Color) -> Self {
         Self { glyph, foreground_color, background_color }

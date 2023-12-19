@@ -31,8 +31,8 @@ use crate::res::config_file::ConfigFile;
 
 /// A [bevy::prelude::Resource] for configuring and creating the display [Window] of the game.
 ///
-/// It uses the [PluginServiceProvider] trait for conversion into the bevy [WindowPlugin],
-/// which can then be insert directly into the ECS.
+/// It uses the [PluginProvider] trait for conversion into the
+/// bevy [WindowPlugin], which can then be insert directly into the ECS.
 ///
 /// It is usually not instantiated directly, but deserialized from a configuration file shipped
 /// with the game. This allows the user to customize the graphics of the game and persist the
@@ -79,7 +79,7 @@ use crate::res::config_file::ConfigFile;
 /// * [WindowPosition]
 /// * [MonitorSelection]
 /// * [WindowPlugin]
-/// * [PluginServiceProvider]
+/// * [PluginProvider]
 ///
 #[derive(Debug, Clone, Deserialize, Resource)]
 pub struct WindowConfig {
