@@ -6,7 +6,7 @@
       <paths name="static-lite-server">
         <serverdata>
           <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$/target/wasm32-unknown-unknown/debug/web" web="/" />
+            <mapping deploy="/" local="$PROJECT_DIR$/target/wasm32-unknown-unknown/debug/out" web="/" />
           </mappings>
         </serverdata>
       </paths>
