@@ -28,4 +28,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Libraries
 
-For a list of all third-party libraries used by `BRouge` any capacity, see [LIBRARIES](./LIBRARIES.md).
+For a list of all third-party libraries used by `BRouge` in any capacity, see [LIBRARIES](./LIBRARIES.md).
