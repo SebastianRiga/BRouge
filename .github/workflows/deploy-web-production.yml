@@ -1,0 +1,56 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Web production
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Build web production
+  build-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install required system libraries
+        run: sudo apt-get install libsdl2-dev
+      - name: Install minimal stable rust version
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Build web release
+        run: cd './scripts' && sh 'build_wasm.sh' release
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: web
+          path: './target/wasm32-unknown-unknown/release/web'
+  
+  # Deploy web production
+  deploy:
+    needs: build-production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download web artifact
+        uses: actions/download-artifact@v4.1.0
+        with:
+          name: web
+          path: './output'
+      - name: Deploy web production to vercel
+        uses: amondnet/vercel-action@v25.1.1
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: --prod
+          vercel-directory: './output'
+            
