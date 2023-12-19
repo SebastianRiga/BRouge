@@ -32,7 +32,7 @@ fi
 
 echo "Web release will be build for: $target"
 
-declare wasm_dir="../target/wasm32-unknown-unknown/$target"
+declare wasm_dir="target/wasm32-unknown-unknown/$target"
 
 if [ "$target" == "release" ]; then
     echo "Running unit tests..."
@@ -50,6 +50,6 @@ wasm-bindgen --out-dir "$wasm_dir/out" --target web --no-typescript "$wasm_dir/b
 
 echo "Copying resources to output dir..."
 
-bash copy_resources_to_target.sh "$target" 1
+bash scripts/copy_resources_to_target.sh "$target" 1
 
-echo "Done. Output can bound at: $wasm_dir/out"
+echo "Done. Output can found at: $wasm_dir/out"

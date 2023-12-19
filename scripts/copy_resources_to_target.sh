@@ -31,12 +31,12 @@ if [ "$target" != "debug" ] && [ "$target" != "release" ]; then
 fi
 
 if [ "$is_web_build" -eq 1 ]; then
-    cp -fR "../config" "../target/wasm32-unknown-unknown/$target/out"
-    cp -fR "../assets" "../target/wasm32-unknown-unknown/$target/out"
-    cp -f "../web/index.html" "../target/wasm32-unknown-unknown/$target/out"
+    cp -fR "config" "target/wasm32-unknown-unknown/$target/out"
+    cp -fR "assets" "target/wasm32-unknown-unknown/$target/out"
+    cp -f "web/index.html" "target/wasm32-unknown-unknown/$target/out"
   else
-    cp -fR "../config" "../target/$target"
-    cp -fR "../assets" "../target/$target"
+    cp -fR "config" "target/$target"
+    cp -fR "assets" "target/$target"
 fi
 
 
