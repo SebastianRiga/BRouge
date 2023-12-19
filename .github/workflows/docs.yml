@@ -41,21 +41,31 @@ jobs:
           override: true
       - name: Build docs
         run: cargo doc
+      - name: Store docs
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: docs
+          path: './target/doc'
 
   # Deploy to github pages
-  deploy:
+  deploy-docs:
     needs: build-docs
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Fetch docs
+        uses: actions/download-artifact@v4.1.0
+        with:
+          name: docs
+          path: './docs'
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: './target/doc'
+          path: './docs'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v3
