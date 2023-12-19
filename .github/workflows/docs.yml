@@ -1,5 +1,5 @@
 # Workflow to build and deploy rust docs
-name: Deploy documentation
+name: Documentation
 
 on:
   # Runs on pushes targeting the default branch

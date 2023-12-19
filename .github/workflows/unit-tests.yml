@@ -1,5 +1,5 @@
 # Workflow to run the game's unit tests
-name: Run unit tests
+name: Unit tests
 
 on:
   push:

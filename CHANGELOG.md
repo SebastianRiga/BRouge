@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Maintenance] Tue Dec 19 EST 2023
 
+Cleaned workflows files and documentation.
+
+### Housekeeping
+
 * Cleaned up workflow files
 * Fixed documentation issues
 
