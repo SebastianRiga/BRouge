@@ -28,6 +28,8 @@ jobs:
           toolchain: stable
           override: true
           target: wasm32-unknown-unknown
+      - name: Install wasm-bindgen
+        run: cargo install -f wasm-bindgen-cli
       - name: Build web release
         working-directory: './scripts'
         run: bash './build_wasm.sh' release

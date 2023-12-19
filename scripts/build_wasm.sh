@@ -27,22 +27,29 @@ declare target="$1"
 
 if [ "$target" != "debug" ] && [ "$target" != "release" ]; then
   target="debug"
+  echo "No valid target specified, falling back to debug!"
 fi
+
+echo "Web release will be build for: $target"
 
 declare wasm_dir="../target/wasm32-unknown-unknown/$target"
 
 if [ "$target" == "release" ]; then
-  cargo clean
-  cargo check --target wasm32-unknown-unknown
-  cargo test
-fi
-
-if [ "$target" == "release" ]; then
+    echo "Running unit tests..."
+    cargo test
+    echo "Starting debug build..."
     cargo build --release --target wasm32-unknown-unknown
   else
+    echo "Starting release build..."
     cargo build --target wasm32-unknown-unknown
 fi
 
-wasm-bindgen --out-dir "$wasm_dir/web" --target web "$wasm_dir/b_rouge.wasm"
+echo "Running wasm-bindgen..."
+
+wasm-bindgen --out-dir "$wasm_dir/out" --target web --no-typescript "$wasm_dir/b_rouge.wasm"
+
+echo "Copying resources to output dir..."
 
 sh copy_resources_to_target.sh "$target" 1
+
+echo "Done. Output can bound at: $wasm_dir/out"

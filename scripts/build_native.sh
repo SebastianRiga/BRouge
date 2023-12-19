@@ -27,15 +27,23 @@ declare target="$1"
 
 if [ "$target" != "debug" ] && [ "$target" != "release" ]; then
   target="debug"
+  echo "No valid target specified, falling back to debug!"
 fi
 
+echo "Native release will be build for: $target"
+
 if [ "$target" == "release" ]; then
-    cargo clean
-    cargo check
+    echo "Running unit tests..."
     cargo test
+    echo "Starting release build..."
     cargo build --release
   else
+    echo "Starting debug build..."
     cargo build
 fi
 
+echo "Copying resources to output dir..."
+
 sh copy_resources_to_target.sh "$target" 0
+
+echo "Done. Output can bound at: target/$target"
