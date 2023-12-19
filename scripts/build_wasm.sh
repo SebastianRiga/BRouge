@@ -50,6 +50,6 @@ wasm-bindgen --out-dir "$wasm_dir/out" --target web --no-typescript "$wasm_dir/b
 
 echo "Copying resources to output dir..."
 
-sh copy_resources_to_target.sh "$target" 1
+bash copy_resources_to_target.sh "$target" 1
 
 echo "Done. Output can bound at: $wasm_dir/out"
