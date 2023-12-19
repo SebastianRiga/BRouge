@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Maintenance] Tue Dec 19 EST 2023
 
+Updated build scripts.
+
+### Housekeeping
+
+* [scripts/build_native.sh](scripts/build_native.sh) - Can now be run from the root director.
+* [scripts/build_wasm.sh](scripts/build_wasm.sh) - Can now be run from the root director.
+* [scripts/copy_resources_to_target.sh](scripts/copy_resources_to_target.sh) - Can now be run from the root director.
+* [assets/.gitkeep](assets/.gitkeep) - Added to prevent the `assets` folder to be stripped while empty.
+
+## [Maintenance] Tue Dec 19 EST 2023
+
 Cleaned workflows files and documentation.
 
 ### Housekeeping
