@@ -31,8 +31,7 @@ jobs:
       - name: Install wasm-bindgen
         run: cargo install -f wasm-bindgen-cli
       - name: Build web release
-        working-directory: './scripts'
-        run: bash './build_wasm.sh' release
+        run: bash './scripts/build_wasm.sh' release
       - name: Upload web artifact
         uses: actions/upload-artifact@v4.0.0
         with:
