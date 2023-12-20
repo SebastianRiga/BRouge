@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use std::fmt::Debug;
 use bevy::math::{IVec2, UVec2, Vec2};
+use std::fmt::Debug;
 
 /// Describes a position in a two dimensional state, consisting of a `x` and `y``coordinate.
 ///

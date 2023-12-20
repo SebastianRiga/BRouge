@@ -111,7 +111,7 @@ pub trait Dimension2d: Debug + Copy + Clone {
         (self.width() * self.height()) as usize
     }
 
-    /// Creates a new `i32` array with a fixed length of `2`, which contains the [Dimension2d]'s 
+    /// Creates a new `i32` array with a fixed length of `2`, which contains the [Dimension2d]'s
     /// width at the first position and the height at the last.
     ///
     /// # About

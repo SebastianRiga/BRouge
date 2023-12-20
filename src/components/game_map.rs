@@ -72,13 +72,13 @@ pub struct GameMap {
 impl GameMap {
     /// Creates a new [GameMap] instance with the passed `dimension`.
     ///
-    /// # Arguments 
+    /// # Arguments
     ///
     /// * `dimension`: The [Dimension2d] with which the map should be created.
     ///
-    /// returns: [GameMap] 
+    /// returns: [GameMap]
     ///
-    /// # Examples 
+    /// # Examples
     ///
     /// ```
     /// fn startup_system(mut commands: Commands) {

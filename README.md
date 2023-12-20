@@ -3,6 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Tests](https://github.com/SebastianRiga/BRouge/actions/workflows/unit-tests.yml/badge.svg)
 ![Docs](https://github.com/SebastianRiga/BRouge/actions/workflows/docs.yml/badge.svg)
+![Web production](https://github.com/SebastianRiga/BRouge/actions/workflows/deploy-web-production.yml/badge.svg)
+![Web preview](https://github.com/SebastianRiga/BRouge/actions/workflows/deploy-web-preview.yml/badge.svg)
 
 ## Prelude
 

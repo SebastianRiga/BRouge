@@ -108,15 +108,21 @@ impl AsciiSprite {
     /// * `ascii_sprite` macro
     ///
     pub fn new(glyph: char, foreground_color: Color, background_color: Color) -> Self {
-        Self { glyph, foreground_color, background_color }
+        Self {
+            glyph,
+            foreground_color,
+            background_color,
+        }
     }
 }
 
 impl View for AsciiSprite {
     fn render_at(&self, position: impl Position2d, terminal: &mut Mut<Terminal>) {
-        terminal.put_char(position.as_array(), self.glyph
-            .fg(self.foreground_color)
-            .bg(self.background_color),
+        terminal.put_char(
+            position.as_array(),
+            self.glyph
+                .fg(self.foreground_color)
+                .bg(self.background_color),
         )
     }
 }
@@ -167,14 +173,14 @@ macro_rules! ascii_sprite {
         $crate::components::ascii_sprite::AsciiSprite::new(
             $glyph,
             $foreground_color,
-            bevy::prelude::Color::WHITE
+            bevy::prelude::Color::WHITE,
         )
     };
     ($glyph: expr, $foreground_color: expr, $background_color: expr) => {
         $crate::components::ascii_sprite::AsciiSprite::new(
             $glyph,
             $foreground_color,
-            $background_color
+            $background_color,
         )
     };
 }

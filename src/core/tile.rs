@@ -43,13 +43,13 @@ pub enum TileType {
 impl View for TileType {
     fn render_at(&self, position: impl Position2d, terminal: &mut Mut<Terminal>) {
         match self {
-            TileType::Floor => {
-                terminal.put_char(position.as_array(), FormattedTile::new()
+            TileType::Floor => terminal.put_char(
+                position.as_array(),
+                FormattedTile::new()
                     .glyph('.')
                     .fg(Color::GREEN)
                     .bg(Color::BLACK),
-                )
-            }
+            ),
         }
     }
 }

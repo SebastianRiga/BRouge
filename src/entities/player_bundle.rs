@@ -82,12 +82,12 @@ impl PlayerBundle {
     /// Since: `0.1.5`
     ///
     pub fn spawn(commands: &mut Commands, starting_position: impl Position2d) -> Entity {
-        commands.spawn(
-            Self {
+        commands
+            .spawn(Self {
                 player: Player,
                 position: Coord2d::from_position(starting_position),
                 sprite: ascii_sprite!('@', Color::ORANGE, Color::BLACK),
-            }
-        ).id()
+            })
+            .id()
     }
 }

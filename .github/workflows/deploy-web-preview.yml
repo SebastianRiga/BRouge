@@ -4,7 +4,7 @@ name: Web production
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches: ["dev"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -14,7 +14,7 @@ env:
 
 jobs:
   # Build web production
-  build-production:
+  build-preview:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,8 +30,8 @@ jobs:
           target: wasm32-unknown-unknown
       - name: Install wasm-bindgen
         run: cargo install -f wasm-bindgen-cli
-      - name: Build web release
-        run: bash './scripts/build_wasm.sh' release
+      - name: Build web preview
+        run: bash './scripts/build_wasm.sh' debug
       - name: Upload web artifact
         uses: actions/upload-artifact@v4.0.0
         with:
@@ -39,8 +39,8 @@ jobs:
           path: './target/wasm32-unknown-unknown/release/out'
   
   # Deploy web production
-  deploy-release:
-    needs: build-production
+  deploy-preview:
+    needs: build-preview
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,12 +50,11 @@ jobs:
         with:
           name: web
           path: './output'
-      - name: Deploy web production to vercel
+      - name: Deploy web preview to vercel
         uses: amondnet/vercel-action@v25.1.1
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: --prod
           woriking-directory: './output'
             

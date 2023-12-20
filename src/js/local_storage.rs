@@ -39,8 +39,8 @@
 //!
 
 use log::warn;
-use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::JsValue;
 
 /// wasm_bindgen definitions for the js_storage.
 #[wasm_bindgen(module = "/web/bridge/storage.js")]
@@ -138,7 +138,6 @@ extern "C" {
     fn write_local_storage_actual(key: &str, value: &str) -> Result<(), JsValue>;
 }
 
-
 /// Attempts to read the string value from the local browser storage for the passed `key`.
 /// If no `value` for the supplied `key` exist, [None] is returned.
 ///
@@ -165,16 +164,14 @@ extern "C" {
 ///
 pub fn read_local_storage(key: &str) -> Option<String> {
     match read_local_storage_actual(key) {
-        Ok(js_value) => {
-            match js_value.as_string() {
-                None => {
-                    web_sys::console::error_1(&js_value);
-                    warn!("Unable fetch data from local storage for key: {}!", key);
-                    None
-                }
-                Some(json) => Some(json)
+        Ok(js_value) => match js_value.as_string() {
+            None => {
+                web_sys::console::error_1(&js_value);
+                warn!("Unable fetch data from local storage for key: {}!", key);
+                None
             }
-        }
+            Some(json) => Some(json),
+        },
         Err(js_error) => {
             web_sys::console::error_1(&js_error);
             warn!("Unable fetch data from local storage for key: {}!", key);

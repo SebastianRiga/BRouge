@@ -29,7 +29,6 @@
 //! Since: `0.1.5`
 //!
 
-
 #[cfg(not(target_family = "wasm"))]
 use std::io::Read;
 
@@ -76,7 +75,10 @@ pub fn load_file(path: &str) -> String {
         .read_to_string(&mut json)
         .unwrap_or_else(|error| {
             bevy::log::error!("{}", error.to_string());
-            panic!("Unable to read file data, stream is not valid UTF-8 at {}!", path)
+            panic!(
+                "Unable to read file data, stream is not valid UTF-8 at {}!",
+                path
+            )
         });
 
     json
@@ -105,6 +107,6 @@ pub fn load_file(path: &str) -> String {
 pub fn load_file(path: &str) -> String {
     match local_storage::read_local_storage(path) {
         Some(json) => json,
-        None => panic!("Unable to load file at: {}!", path)
+        None => panic!("Unable to load file at: {}!", path),
     }
 }

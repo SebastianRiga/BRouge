@@ -200,7 +200,7 @@ impl InputConfig {
             _ if self.down == key_code => Some(InputType::Down),
             _ if self.right == key_code => Some(InputType::Right),
             _ if self.cancel == key_code => Some(InputType::Cancel),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -226,7 +226,10 @@ impl InputType {
     /// Since: `0.1.5`
     ///
     pub fn is_movement_event(&self) -> bool {
-        matches!(self, InputType::Up | InputType::Left | InputType::Down | InputType::Right)
+        matches!(
+            self,
+            InputType::Up | InputType::Left | InputType::Down | InputType::Right
+        )
     }
 }
 
@@ -245,10 +248,22 @@ mod unit_tests {
     #[test]
     fn test_keycode_to_input_event_conversion() {
         assert_eq!(InputType::Up, INPUT_CONFIG.parse_input(KeyCode::W).unwrap());
-        assert_eq!(InputType::Left, INPUT_CONFIG.parse_input(KeyCode::A).unwrap());
-        assert_eq!(InputType::Right, INPUT_CONFIG.parse_input(KeyCode::D).unwrap());
-        assert_eq!(InputType::Down, INPUT_CONFIG.parse_input(KeyCode::S).unwrap());
-        assert_eq!(InputType::Cancel, INPUT_CONFIG.parse_input(KeyCode::Escape).unwrap());
+        assert_eq!(
+            InputType::Left,
+            INPUT_CONFIG.parse_input(KeyCode::A).unwrap()
+        );
+        assert_eq!(
+            InputType::Right,
+            INPUT_CONFIG.parse_input(KeyCode::D).unwrap()
+        );
+        assert_eq!(
+            InputType::Down,
+            INPUT_CONFIG.parse_input(KeyCode::S).unwrap()
+        );
+        assert_eq!(
+            InputType::Cancel,
+            INPUT_CONFIG.parse_input(KeyCode::Escape).unwrap()
+        );
     }
 
     #[test]

@@ -28,6 +28,6 @@
 //! Since: `0.1.5`
 //!
 
-pub mod window_config;
-pub mod input_config;
 pub mod config_file;
+pub mod input_config;
+pub mod window_config;

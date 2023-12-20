@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Maintenance] Wed Dec 20 EST 2023
 
+Cleaned up web prod deployment action and added web preview deployment action.
+
+### Housekeeping
+
+* [deploy-web-production.yml](.github/workflows/deploy-web-production.yml) - Cleaned up naming.
+* [deploy-web-preview.yml](.github/workflows/deploy-web-preview.yml) - Added deployment action for web preview builds.
+
+## [Maintenance] Wed Dec 20 EST 2023
+
+Added `vercel.json` for web deployment configuration.
+
+### Housekeeping
+
 * [vercel.json](vercel.json) - Added to configure the project to use Github actions
 for the `Vercel` deployment.
 
