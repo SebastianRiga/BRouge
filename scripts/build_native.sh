@@ -44,6 +44,6 @@ fi
 
 echo "Copying resources to output dir..."
 
-sh scripts/copy_resources_to_target.sh "$target" 0
+bash scripts/copy_resources_to_target.sh "$target" 0
 
 echo "Done. Output can found at: target/$target"
