@@ -48,3 +48,33 @@ pub const TITLE: &str = "BRouge";
 /// Since: `0.1.5`
 ///
 pub const TILES_PER_PIXEL: i32 = 8;
+
+/// The maximum number of rooms allowed on the map to prevent room-overcrowding.
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.7`
+///
+pub const MAP_MAX_ROOMS: i32 = 30;
+
+/// The minimum size of a room on the map in tiles.
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.7`
+///
+pub const MAP_MIN_ROOM_SIZE: i32 = 6;
+
+/// The maximum size of a room on the map in tiles.
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.7`
+///
+pub const MAP_MAX_ROOM_SIZE: i32 = 10;

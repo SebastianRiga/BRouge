@@ -28,13 +28,13 @@ use wasm_logger;
 
 use crate::plugins::bootstrap_plugin::BootstrapPlugin;
 
-mod core;
-mod res;
 mod components;
-mod plugins;
-mod os;
-mod js;
+mod core;
 mod entities;
+mod js;
+mod os;
+mod plugins;
+mod res;
 
 pub fn main() {
     #[cfg(target_family = "wasm")]

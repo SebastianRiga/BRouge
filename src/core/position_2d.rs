@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use std::fmt::Debug;
 use bevy::math::{IVec2, UVec2, Vec2};
+use std::fmt::Debug;
 
 /// Describes a position in a two dimensional state, consisting of a `x` and `y``coordinate.
 ///
@@ -54,7 +54,7 @@ use bevy::math::{IVec2, UVec2, Vec2};
 ///
 /// * [crate::components::coord_2d::Coord2d]
 ///
-pub trait Position2d: Debug + Copy + Clone {
+pub trait Position2d: Debug + Copy + Clone + PartialEq {
     /// The location on the horizontal x-axis of the [Position2d].
     ///
     /// # About
@@ -63,7 +63,7 @@ pub trait Position2d: Debug + Copy + Clone {
     ///
     /// Since: `0.1.5`
     ///
-    fn x(&self) -> i32;
+    fn x_coordinate(&self) -> i32;
 
     /// The location on the vertical y-axis of the [Position2d].
     ///
@@ -73,7 +73,38 @@ pub trait Position2d: Debug + Copy + Clone {
     ///
     /// Since: `0.1.5`
     ///
-    fn y(&self) -> i32;
+    fn y_coordinate(&self) -> i32;
+
+    /// Calculates the delta between this and the passed `other` position by subtracting its coordinates
+    /// from the calling ones.
+    ///
+    /// # Arguments
+    ///
+    /// * `other`: The [Position2d] with which the delta should be calculated.
+    ///
+    /// returns: [i32; 2]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let start = [8, 4];
+    /// let end = [6, 3];
+    ///
+    /// assert_eq!([2, 1], start.delta(&end).as_array());
+    /// ```
+    ///
+    /// # About
+    ///
+    /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+    ///
+    /// Since: `0.1.7`
+    ///
+    fn delta(&self, other: &impl Position2d) -> [i32; 2] {
+        [
+            self.x_coordinate() - other.x_coordinate(),
+            self.y_coordinate() - other.y_coordinate(),
+        ]
+    }
 
     /// Creates a new `i32` array with a fixed length of `2`, which contains the [Position2d]'s `x` coordinate
     /// at the first index and the `y` coordinate at the last.
@@ -93,7 +124,7 @@ pub trait Position2d: Debug + Copy + Clone {
     /// Since: `0.1.5`
     ///
     fn as_array(&self) -> [i32; 2] {
-        [self.x(), self.y()]
+        [self.x_coordinate(), self.y_coordinate()]
     }
 }
 
@@ -112,11 +143,11 @@ pub trait Position2d: Debug + Copy + Clone {
 macro_rules! implement_position_2d {
     ($type:ty) => {
         impl Position2d for $type {
-            fn x(&self) -> i32 {
+            fn x_coordinate(&self) -> i32 {
                 self[0] as i32
             }
 
-            fn y(&self) -> i32 {
+            fn y_coordinate(&self) -> i32 {
                 self[1] as i32
             }
         }
@@ -145,21 +176,21 @@ mod tests {
 
     #[test]
     fn test_computed_properties() {
-        assert_eq!(80, VEC2.x());
-        assert_eq!(80, I_VEC2.x());
-        assert_eq!(80, U_VEC2.x());
-        assert_eq!(80, U32_ARRAY.x());
-        assert_eq!(80, I32_ARRAY.x());
-        assert_eq!(80, F32_ARRAY.x());
-        assert_eq!(80, USIZE_ARRAY.x());
+        assert_eq!(80, VEC2.x_coordinate());
+        assert_eq!(80, I_VEC2.x_coordinate());
+        assert_eq!(80, U_VEC2.x_coordinate());
+        assert_eq!(80, U32_ARRAY.x_coordinate());
+        assert_eq!(80, I32_ARRAY.x_coordinate());
+        assert_eq!(80, F32_ARRAY.x_coordinate());
+        assert_eq!(80, USIZE_ARRAY.x_coordinate());
 
-        assert_eq!(50, VEC2.y());
-        assert_eq!(50, I_VEC2.y());
-        assert_eq!(50, U_VEC2.y());
-        assert_eq!(50, U32_ARRAY.y());
-        assert_eq!(50, I32_ARRAY.y());
-        assert_eq!(50, F32_ARRAY.y());
-        assert_eq!(50, USIZE_ARRAY.y());
+        assert_eq!(50, VEC2.y_coordinate());
+        assert_eq!(50, I_VEC2.y_coordinate());
+        assert_eq!(50, U_VEC2.y_coordinate());
+        assert_eq!(50, U32_ARRAY.y_coordinate());
+        assert_eq!(50, I32_ARRAY.y_coordinate());
+        assert_eq!(50, F32_ARRAY.y_coordinate());
+        assert_eq!(50, USIZE_ARRAY.y_coordinate());
     }
 
     //noinspection ALL

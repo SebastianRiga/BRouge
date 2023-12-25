@@ -24,6 +24,7 @@ use bevy::prelude::{Bundle, Color, Commands, Entity};
 use crate::ascii_sprite;
 use crate::components::ascii_sprite::AsciiSprite;
 use crate::components::coord_2d::Coord2d;
+use crate::components::fov::Fov;
 use crate::components::player::Player;
 use crate::core::position_2d::Position2d;
 
@@ -36,6 +37,7 @@ use crate::core::position_2d::Position2d;
 /// * `position`: The starting position of the player entity in the game's world
 /// when being spawned.
 /// * `sprite`: Renderable sprite representing the player entity on-screen.
+/// * `fov`: The radius around the player in which tiles, monsters and items are visible.
 ///
 /// # About
 ///
@@ -55,6 +57,8 @@ pub struct PlayerBundle {
     pub position: Coord2d,
     /// Renderable sprite representing the `player` `entity` on-screen.
     pub sprite: AsciiSprite,
+    /// The radius around the player in which tiles, monsters and items are visible.
+    pub fov: Fov,
 }
 
 impl PlayerBundle {
@@ -81,13 +85,14 @@ impl PlayerBundle {
     ///
     /// Since: `0.1.5`
     ///
-    pub fn spawn(commands: &mut Commands, starting_position: impl Position2d) -> Entity {
-        commands.spawn(
-            Self {
+    pub fn spawn(commands: &mut Commands, starting_position: &impl Position2d) -> Entity {
+        commands
+            .spawn(Self {
                 player: Player,
                 position: Coord2d::from_position(starting_position),
                 sprite: ascii_sprite!('@', Color::ORANGE, Color::BLACK),
-            }
-        ).id()
+                fov: Fov::new(8),
+            })
+            .id()
     }
 }

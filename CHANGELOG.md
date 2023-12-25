@@ -5,7 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Maintenance] Tue Dec 19 EST 2023
+## [0.1.7] Mon Dec 25 EST 2023
+
+Implemented room and corridor generation for the game map, as well as field of view calculation.
+
+### Added
+
+* [components/fov.rs](src/components/fov.rs) - To provide a component which tracks the current field of view for the
+`player entity`.  Interfaces with the `fov_algorithm::field_of_view` function for updates.
+* [core/fov_algorithm.rs](src/core/fov_algorithm.rs) - To calculate and update the player fov with the respective
+systems and components.
+* [core/rectangle.rs](src/core/rectangle.rs) - To represent a rectangular room on the `GameMap`.
+* [core/rng.rs](src/core/rng.rs) - To provide a random number generator and classic D&D dice roller for the game.
+* [core/var_args.rs](src/core/var_args.rs) - To provide a generic way to pass variable arguments of differing types to
+functions, i.e, the `View::render_at` function.
+
+### Changed
+
+* [components/game_map.rs](src/components/game_map.rs) - By adding properties to track currently
+visible and seen tiles, as well as constructor functionality to generate a map with 
+random rooms and connecting corridors. 
+Also implemented the new `PlayArea2d` trait to interface with the fov calculation.
+* [core/constants.rs](src/core/constants.rs) - By adding constants for the maximum room count for the map, 
+as well as min and max values for room sizes.
+* [core/dimension_2d.rs](src/core/dimension_2d.rs) - By adding a function to check if a given position is within
+bounds of the respective dimension.
+* [core/position_2d.rs](src/core/position_2d.rs) - By adding a function to calculate the delta between two coordinates.
+* [core/tile.rs](src/core/tile.rs) - By adding the `Wall` type to represent none-traversable tiles and updating the
+`render_at` function to include the type, as well as take seen and currently visible tiles from the `GameMap` and `Fov`
+into account.
+* [core/view.rs](src/core/view.rs) - By extending the `View::render_at` function arguments with the `options` `VarArg`
+parameter. This allows all `View` implementors to use one generic function for rendering, while allowing for flexible
+implementor specific additional arguments.
+* [entities/player_bundle.rs](src/entities/player_bundle.rs) - By adding the new `Fov` component to the spawn logic.
+* [plugins/game_state_plugin.rs](src/plugins/game_state_plugin.rs) - By adding the `fov_system` to recalculate and
+update the `player entity's fov` component when the user moves the player. 
+
+### Removed
+
+* [.idea/runConfigurations/Run_web.xml] - No longer needed due to local test server integration. 
+* [.idea/runConfigurations/Test_web.xml] - No longer needed due wasm32-unknown-unknown unit configuration issues. 
+
+### Housekeeping
+
+* Formatted code
+* Added `rand` and `getrandom` libs to facilitate the game's random number generation.
+
+## [0.1.6 - Maintenance 2] Tue Dec 19 EST 2023
 
 Updated build scripts.
 
@@ -16,7 +62,7 @@ Updated build scripts.
 * [scripts/copy_resources_to_target.sh](scripts/copy_resources_to_target.sh) - Can now be run from the root director.
 * [assets/.gitkeep](assets/.gitkeep) - Added to prevent the `assets` folder to be stripped while empty.
 
-## [Maintenance] Tue Dec 19 EST 2023
+## [0.1.6 - Maintenance 1] Tue Dec 19 EST 2023
 
 Cleaned workflows files and documentation.
 

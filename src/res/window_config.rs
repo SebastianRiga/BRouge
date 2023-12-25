@@ -139,7 +139,7 @@ impl WindowConfig {
             0 => WindowPosition::Automatic,
             1 => WindowPosition::Centered(MonitorSelection::Current),
             2 => WindowPosition::Centered(MonitorSelection::Primary),
-            _ => WindowPosition::Automatic
+            _ => WindowPosition::Automatic,
         }
     }
 
@@ -157,7 +157,10 @@ impl WindowConfig {
     /// Since: `0.1.5`
     ///
     pub fn terminal_size(&self) -> impl Dimension2d {
-        [self.width / constants::TILES_PER_PIXEL, self.height / constants::TILES_PER_PIXEL]
+        [
+            self.width / constants::TILES_PER_PIXEL,
+            self.height / constants::TILES_PER_PIXEL,
+        ]
     }
 }
 
@@ -166,10 +169,7 @@ impl PluginProvider<WindowPlugin> for WindowConfig {
         WindowPlugin {
             primary_window: Some(Window {
                 title: String::from(constants::TITLE),
-                resolution: WindowResolution::new(
-                    self.width as f32,
-                    self.height as f32,
-                ),
+                resolution: WindowResolution::new(self.width as f32, self.height as f32),
                 resizable: self.resizeable,
                 position: self.get_position(),
                 fit_canvas_to_parent: true,
@@ -233,22 +233,15 @@ mod unit_tests {
 
     #[test]
     fn test_plugin_provision() {
-        let window_config = WindowConfig::new(
-            [800, 640],
-            false,
-            0,
-        );
+        let window_config = WindowConfig::new([800, 640], false, 0);
 
-        let primary_window: Window = window_config
-            .provide_plugin()
-            .primary_window
-            .unwrap();
+        let primary_window: Window = window_config.provide_plugin().primary_window.unwrap();
 
         assert_eq!(constants::TITLE, primary_window.title);
-        assert_eq!(primary_window.resolution, WindowResolution::new(
-            window_config.width as f32,
-            window_config.height as f32,
-        ));
+        assert_eq!(
+            primary_window.resolution,
+            WindowResolution::new(window_config.width as f32, window_config.height as f32,)
+        );
         assert_eq!(window_config.resizeable, primary_window.resizable);
         assert_eq!(window_config.get_position(), primary_window.position);
         assert_eq!(true, primary_window.fit_canvas_to_parent);

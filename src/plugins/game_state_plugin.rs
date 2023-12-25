@@ -20,19 +20,25 @@
  */
 
 use bevy::app::{App, AppExit, Plugin};
-use bevy::input::ButtonState;
 use bevy::input::keyboard::KeyboardInput;
+use bevy::input::ButtonState;
 use bevy::log::info;
-use bevy::prelude::{Commands, Entity, EventReader, EventWriter, in_state, IntoSystemConfigs, Mut, OnEnter, OnExit, Query, Res, Update, With};
+use bevy::prelude::{
+    in_state, Commands, Entity, EventReader, EventWriter, IntoSystemConfigs, Mut, OnEnter, OnExit,
+    Query, Res, Update, With,
+};
 use bevy_ascii_terminal::Terminal;
 
 use crate::components::ascii_sprite::AsciiSprite;
 use crate::components::coord_2d::Coord2d;
+use crate::components::fov::Fov;
 use crate::components::game_map::GameMap;
 use crate::components::player::Player;
 use crate::core::app_state::AppState;
 use crate::core::dimension_2d::Dimension2d;
+use crate::core::fov_algorithm::{field_of_view, PlayArea2d};
 use crate::core::position_2d::Position2d;
+use crate::core::var_args::VarArgs;
 use crate::core::view::{View, ViewGroup};
 use crate::entities::player_bundle::PlayerBundle;
 use crate::res::input_config::{InputConfig, InputType};
@@ -56,9 +62,11 @@ pub struct GameStatePlugin;
 
 impl Plugin for GameStatePlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_systems(OnEnter(AppState::Game), startup_system)
-            .add_systems(Update, (input_system, render_system).run_if(in_state(AppState::Game)))
+        app.add_systems(OnEnter(AppState::Game), startup_system)
+            .add_systems(
+                Update,
+                (input_system, fov_system, render_system).run_if(in_state(AppState::Game)),
+            )
             .add_systems(OnExit(AppState::Game), shutdown_system);
     }
 
@@ -89,8 +97,11 @@ impl Plugin for GameStatePlugin {
 /// Since: `0.1.5`
 ///
 fn startup_system(mut commands: Commands, window_config: Res<WindowConfig>) {
-    commands.spawn(GameMap::new(window_config.terminal_size()));
-    PlayerBundle::spawn(&mut commands, window_config.terminal_size().center());
+    let game_map = GameMap::new(window_config.terminal_size());
+    let starting_position = game_map.rooms.first().unwrap().center();
+
+    commands.spawn(game_map);
+    PlayerBundle::spawn(&mut commands, &starting_position);
 }
 
 /// System to handle user's input through any of the connected peripherals like the keyboard or mouse.
@@ -114,9 +125,9 @@ fn startup_system(mut commands: Commands, window_config: Res<WindowConfig>) {
 ///
 fn input_system(
     input_config: Res<InputConfig>,
-    window_config: Res<WindowConfig>,
+    game_map_query: Query<&GameMap>,
     mut key_events: EventReader<KeyboardInput>,
-    mut player_position_query: Query<&mut Coord2d, With<Player>>,
+    mut player_query: Query<(&mut Fov, &mut Coord2d), With<Player>>,
     mut exit_event: EventWriter<AppExit>,
 ) {
     for event in key_events.read() {
@@ -127,12 +138,10 @@ fn input_system(
         if let Some(input) = input_config.parse_input(event.key_code.unwrap()) {
             info!("Received keyboard input event: {:?}", input);
 
+            let (mut fov, mut position) = player_query.single_mut();
+
             if input.is_movement_event() {
-                handle_player_movement(
-                    &input,
-                    window_config.terminal_size(),
-                    player_position_query.single_mut(),
-                )
+                handle_player_movement(game_map_query.single(), &input, &mut fov, &mut position)
             }
 
             if input == InputType::Cancel {
@@ -140,6 +149,15 @@ fn input_system(
             }
         }
     }
+}
+
+fn fov_system(
+    mut game_map_query: Query<&mut GameMap>,
+    mut fov_query: Query<(&mut Fov, &Coord2d), With<Player>>,
+) {
+    let mut map = game_map_query.single_mut();
+    let (mut fov, position) = fov_query.single_mut();
+    field_of_view(&mut fov, position, &mut map)
 }
 
 /// Renders the next frame of the game which includes the [GameMap] and all renderable [AppState::Game] state relevant
@@ -175,10 +193,8 @@ fn render_system(
 
     game_map_query.single().render(&mut terminal);
 
-    terminal.put_string([1, 1], "Hello bevy render world!");
-
     for (coord, sprite) in render_query.iter() {
-        sprite.render_at(coord.as_array(), &mut terminal);
+        sprite.render_at(&coord.as_array(), &mut terminal, &VarArgs::new());
     }
 }
 
@@ -207,8 +223,14 @@ fn shutdown_system(
     player_query: Query<Entity, With<Player>>,
     game_map_query: Query<Entity, With<GameMap>>,
 ) {
-    commands.get_entity(player_query.single()).unwrap().despawn();
-    commands.get_entity(game_map_query.single()).unwrap().despawn();
+    commands
+        .get_entity(player_query.single())
+        .unwrap()
+        .despawn();
+    commands
+        .get_entity(game_map_query.single())
+        .unwrap()
+        .despawn();
 }
 
 /// Internal function to update the `player entities` positional component according to the passed `input_type`
@@ -244,24 +266,27 @@ fn shutdown_system(
 /// * [Coord2d]
 ///
 fn handle_player_movement(
+    game_map: &GameMap,
     input_type: &InputType,
-    player_area: impl Dimension2d,
-    mut player_position: Mut<Coord2d>,
+    player_fov: &mut Mut<Fov>,
+    player_position: &mut Mut<Coord2d>,
 ) {
-    match input_type {
-        InputType::Up => {
-            player_position.y = player_position.up(player_area.height() - 1).y;
-        }
-        InputType::Left => {
-            player_position.x = player_position.left(0).x;
-        }
-        InputType::Right => {
-            player_position.x = player_position.right(player_area.width() - 1).x;
-        }
-        InputType::Down => {
-            player_position.y = player_position.down(0).y;
-        }
-        _ => {}
+    let new_position = match input_type {
+        InputType::Up => player_position.up(game_map.height - 1),
+        InputType::Left => player_position.left(0),
+        InputType::Right => player_position.right(game_map.width - 1),
+        InputType::Down => player_position.down(0),
+        _ => Coord2d::from_position(&[player_position.x, player_position.y]),
+    };
+
+    if game_map.collides(&new_position) {
+        return;
+    }
+
+    if new_position != **player_position {
+        player_fov.is_dirty = true;
+        player_position.x = new_position.x;
+        player_position.y = new_position.y;
     }
 }
 
@@ -284,24 +309,28 @@ mod tests {
 
         app.update();
 
-        {
-            assert_eq!(1, app.world.query::<&Player>().iter(&app.world).len());
-        }
+        assert_eq!(1, app.world.query::<&Player>().iter(&app.world).len());
 
-        {
-            let (position, sprite) = app.world
-                .query::<(&Coord2d, &AsciiSprite)>()
-                .single(&app.world);
+        assert_eq!(
+            &AsciiSprite::new('@', Color::ORANGE, Color::BLACK),
+            app.world.query::<&AsciiSprite>().single(&app.world)
+        );
 
-            assert_eq!([50, 40], position.as_array());
-            assert_eq!(&AsciiSprite::new('@', Color::ORANGE, Color::BLACK), sprite);
-        }
+        assert_eq!(
+            app.world.query::<&Coord2d>().single(&app.world).as_array(),
+            app.world
+                .query::<&GameMap>()
+                .single(&app.world)
+                .rooms
+                .first()
+                .unwrap()
+                .center()
+        );
 
-        {
-            let game_map = app.world.query::<&GameMap>().single(&app.world);
-            assert_eq!(100, game_map.width);
-            assert_eq!(80, game_map.height);
-        }
+        assert_eq!(
+            [100, 80],
+            app.world.query::<&GameMap>().single(&app.world).as_array()
+        );
     }
 
     #[test]
@@ -324,90 +353,110 @@ mod tests {
 
         let window = app.world.spawn(DummyComponent).id();
 
-        app.world.send_event(
-            KeyboardInput {
-                scan_code: 32,
-                key_code: Some(KeyCode::W),
-                state: ButtonState::Pressed,
-                window,
-            }
-        );
+        app.world.send_event(KeyboardInput {
+            scan_code: 32,
+            key_code: Some(KeyCode::W),
+            state: ButtonState::Pressed,
+            window,
+        });
 
         app.update();
 
-        assert_eq!(&Coord2d::new(50, 41), app.world.query::<(&Coord2d, With<Player>)>().single(&app.world).0);
+        assert_eq!(
+            &Coord2d::new(50, 41),
+            app.world
+                .query::<(&Coord2d, With<Player>)>()
+                .single(&app.world)
+                .0
+        );
 
         // Test keyboard left press and resulting player movement
 
-        app.world.send_event(
-            KeyboardInput {
-                scan_code: 32,
-                key_code: Some(KeyCode::A),
-                state: ButtonState::Pressed,
-                window,
-            }
-        );
+        app.world.send_event(KeyboardInput {
+            scan_code: 32,
+            key_code: Some(KeyCode::A),
+            state: ButtonState::Pressed,
+            window,
+        });
 
         app.update();
 
-        assert_eq!(&Coord2d::new(49, 41), app.world.query::<(&Coord2d, With<Player>)>().single(&app.world).0);
+        assert_eq!(
+            &Coord2d::new(49, 41),
+            app.world
+                .query::<(&Coord2d, With<Player>)>()
+                .single(&app.world)
+                .0
+        );
 
         // Test keyboard down press and resulting player movement
 
-        app.world.send_event(
-            KeyboardInput {
-                scan_code: 32,
-                key_code: Some(KeyCode::S),
-                state: ButtonState::Pressed,
-                window,
-            }
-        );
+        app.world.send_event(KeyboardInput {
+            scan_code: 32,
+            key_code: Some(KeyCode::S),
+            state: ButtonState::Pressed,
+            window,
+        });
 
         app.update();
 
-        assert_eq!(&Coord2d::new(49, 40), app.world.query::<(&Coord2d, With<Player>)>().single(&app.world).0);
+        assert_eq!(
+            &Coord2d::new(49, 40),
+            app.world
+                .query::<(&Coord2d, With<Player>)>()
+                .single(&app.world)
+                .0
+        );
 
         // Test keyboard right press and resulting player movement
 
-        app.world.send_event(
-            KeyboardInput {
-                scan_code: 32,
-                key_code: Some(KeyCode::D),
-                state: ButtonState::Pressed,
-                window,
-            }
-        );
+        app.world.send_event(KeyboardInput {
+            scan_code: 32,
+            key_code: Some(KeyCode::D),
+            state: ButtonState::Pressed,
+            window,
+        });
 
         app.update();
 
-        assert_eq!(&Coord2d::new(50, 40), app.world.query::<(&Coord2d, With<Player>)>().single(&app.world).0);
+        assert_eq!(
+            &Coord2d::new(50, 40),
+            app.world
+                .query::<(&Coord2d, With<Player>)>()
+                .single(&app.world)
+                .0
+        );
 
         // Test unrecognized keyboard press and resulting player movement
 
-        app.world.send_event(
-            KeyboardInput {
-                scan_code: 32,
-                key_code: Some(KeyCode::Escape),
-                state: ButtonState::Pressed,
-                window,
-            }
-        );
+        app.world.send_event(KeyboardInput {
+            scan_code: 32,
+            key_code: Some(KeyCode::Escape),
+            state: ButtonState::Pressed,
+            window,
+        });
 
         app.update();
 
-        assert_eq!(&Coord2d::new(50, 40), app.world.query::<(&Coord2d, With<Player>)>().single(&app.world).0);
+        assert_eq!(
+            &Coord2d::new(50, 40),
+            app.world
+                .query::<(&Coord2d, With<Player>)>()
+                .single(&app.world)
+                .0
+        );
     }
 
     #[test]
     fn test_render_system() {
         let mut app = App::new();
 
-        app.add_event::<KeyboardInput>();
         app.insert_resource(WindowConfig::new([800, 640], true, 1));
         app.add_systems(Startup, startup_system);
         app.add_systems(Update, render_system);
 
-        app.world.spawn(TerminalBundle::from(Terminal::new([100, 80])));
+        app.world
+            .spawn(TerminalBundle::from(Terminal::new([100, 80])));
 
         app.update();
 
@@ -426,6 +475,12 @@ mod tests {
 
         app.update();
 
-        assert_eq!(0, app.world.query::<(&Player, &Coord2d, &AsciiSprite, &GameMap)>().iter(&app.world).len());
+        assert_eq!(
+            0,
+            app.world
+                .query::<(&Player, &Coord2d, &AsciiSprite, &GameMap)>()
+                .iter(&app.world)
+                .len()
+        );
     }
 }

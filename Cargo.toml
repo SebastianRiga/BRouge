@@ -21,6 +21,9 @@ opt-level = 3
 bevy = { version = "0.12.0", features = ["serialize"] }
 bevy_ascii_terminal = "0.14.0"
 
+getrandom = { version = "0.2.11", features = ["js"] }
+rand = { version = "0.8.5", features = ["getrandom"] }
+
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
 

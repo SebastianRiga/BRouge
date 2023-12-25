@@ -20,9 +20,10 @@
  */
 
 use bevy::prelude::{Color, Mut};
-use bevy_ascii_terminal::{FormattedTile, Terminal, TileFormatter};
+use bevy_ascii_terminal::{Terminal, TileFormatter};
 
 use crate::core::position_2d::Position2d;
+use crate::core::var_args::VarArgs;
 use crate::core::view::View;
 
 /// Defines all possible tiles which can be displayed on the in-game map.
@@ -33,23 +34,36 @@ use crate::core::view::View;
 ///
 /// Since: `0.1.5`
 ///
-#[derive(Debug, Copy, Clone, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Default)]
 pub enum TileType {
     /// A standard, walkable tile, which makes up the default floor of the map.
     #[default]
     Floor,
+    /// An impassable tile, marking the position it occupies as not walkable.
+    /// Serves as the default barrier on the map.
+    Wall,
 }
 
 impl View for TileType {
-    fn render_at(&self, position: impl Position2d, terminal: &mut Mut<Terminal>) {
-        match self {
-            TileType::Floor => {
-                terminal.put_char(position.as_array(), FormattedTile::new()
-                    .glyph('.')
-                    .fg(Color::GREEN)
-                    .bg(Color::BLACK),
-                )
-            }
+    fn render_at(&self, position: &impl Position2d, terminal: &mut Mut<Terminal>, options: &VarArgs) {
+        let visible = options.get("visible", false);
+
+        if visible || options.get("seen", false) {
+            match self {
+                TileType::Floor => {
+                    let foreground = if visible {
+                        Color::MIDNIGHT_BLUE
+                    } else {
+                        Color::GRAY
+                    };
+                    terminal.put_char(position.as_array(), '.'.fg(foreground).bg(Color::BLACK));
+                }
+
+                TileType::Wall => {
+                    let foreground = if visible { Color::GREEN } else { Color::GRAY };
+                    terminal.put_char(position.as_array(), '#'.fg(foreground).bg(Color::BLACK));
+                }
+            };
         }
     }
 }

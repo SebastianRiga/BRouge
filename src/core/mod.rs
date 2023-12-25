@@ -28,10 +28,14 @@
 //! Since: `0.1.5`
 //!
 
-pub mod dimension_2d;
+pub mod app_state;
 pub mod constants;
+pub mod dimension_2d;
+pub mod fov_algorithm;
 pub mod plugin_provider;
+pub mod position_2d;
+pub mod rectangle;
+pub mod rng;
 pub mod tile;
 pub mod view;
-pub mod position_2d;
-pub mod app_state;
+pub mod var_args;

@@ -117,8 +117,8 @@ impl Coord2d {
     ///
     /// * [Position2d]
     ///
-    pub fn from_position(position: impl Position2d) -> Self {
-        Coord2d::new(position.x(), position.y())
+    pub fn from_position(position: &impl Position2d) -> Self {
+        Coord2d::new(position.x_coordinate(), position.y_coordinate())
     }
 
     /// Returns the position above the coordinate on the vertical y-axis as a new
@@ -255,11 +255,11 @@ impl Coord2d {
 }
 
 impl Position2d for Coord2d {
-    fn x(&self) -> i32 {
+    fn x_coordinate(&self) -> i32 {
         self.x
     }
 
-    fn y(&self) -> i32 {
+    fn y_coordinate(&self) -> i32 {
         self.y
     }
 }
@@ -270,7 +270,7 @@ mod tests {
 
     #[test]
     fn test_interoperability_with_position_2d() {
-        let coord2d = Coord2d::from_position([40.0, 25.0]);
+        let coord2d = Coord2d::from_position(&[40.0, 25.0]);
 
         assert_eq!(40, coord2d.x);
         assert_eq!(25, coord2d.y);

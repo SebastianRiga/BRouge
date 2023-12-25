@@ -101,7 +101,10 @@ pub trait ConfigFile: DeserializeOwned {
     /// * [file_system::load_file]
     ///
     fn load() -> Self {
-        info!("Resolving file path for config file with name: {}", Self::file_name());
+        info!(
+            "Resolving file path for config file with name: {}",
+            Self::file_name()
+        );
 
         let path = resolve_config_file_path(Self::file_name());
 

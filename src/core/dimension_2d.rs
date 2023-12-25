@@ -24,6 +24,8 @@ use std::fmt::Debug;
 use bevy::math::{IVec2, UVec2};
 use bevy::prelude::Vec2;
 
+use crate::core::position_2d::Position2d;
+
 /// Describes a two dimensional area defined by a horizontal width and a vertical height.
 ///
 /// The trait is implemented by the default for the following types:
@@ -52,7 +54,7 @@ use bevy::prelude::Vec2;
 ///
 /// Since: `0.1.5`
 ///
-pub trait Dimension2d: Debug + Copy + Clone {
+pub trait Dimension2d: Debug + Clone {
     /// The horizontal width of the dimension.
     ///
     /// # About
@@ -93,7 +95,7 @@ pub trait Dimension2d: Debug + Copy + Clone {
     ///
     /// # See also
     ///
-    /// * [crate::core::position_2d::Position2d]
+    /// * [Position2d]
     ///
     fn center(&self) -> [i32; 2] {
         [self.width() / 2, self.height() / 2]
@@ -111,7 +113,36 @@ pub trait Dimension2d: Debug + Copy + Clone {
         (self.width() * self.height()) as usize
     }
 
-    /// Creates a new `i32` array with a fixed length of `2`, which contains the [Dimension2d]'s 
+    /// Checks if the passed `position` is within the bounds of this area.
+    ///
+    /// # Arguments
+    ///
+    /// * `position`: The position to bounds-check.
+    ///
+    /// returns: [bool] - `true` if the passed `position` is in bounds and `false` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let dimension = [400, 200];
+    ///
+    /// assert!(dimension.is_in_bounds([24, 18]));
+    /// assert!(!dimension.is_in_bounds([500, 250]));
+    /// assert!(!dimension.is_in_bounds([-2, -30]));
+    /// ```
+    ///
+    /// # About
+    ///
+    /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+    ///
+    /// Since: `0.1.7`
+    ///
+    fn is_in_bounds(&self, position: &impl Position2d) -> bool {
+        (0..self.width() - 1).contains(&position.x_coordinate())
+            && (0..self.height() - 1).contains(&position.y_coordinate())
+    }
+
+    /// Creates a new `i32` array with a fixed length of `2`, which contains the [Dimension2d]'s
     /// width at the first position and the height at the last.
     ///
     /// # About
@@ -157,7 +188,9 @@ implement_dimension_2d!([usize; 2]);
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::core::dimension_2d::Dimension2d;
+    use bevy::prelude::IVec2;
+    use bevy::prelude::*;
 
     const VEC2: Vec2 = Vec2::new(80.0, 50.0);
     const I_VEC2: IVec2 = IVec2::new(80, 50);
@@ -206,6 +239,16 @@ mod tests {
         assert_eq!(4000, I32_ARRAY.area());
         assert_eq!(4000, F32_ARRAY.area());
         assert_eq!(4000, USIZE_ARRAY.area());
+    }
+
+    #[test]
+    fn test_is_in_bounds_check() {
+        let dimension = [400, 200];
+
+        assert!(dimension.is_in_bounds(&[0, 0]));
+        assert!(dimension.is_in_bounds(&[24, 58]));
+        assert!(!dimension.is_in_bounds(&[500, 300]));
+        assert!(!dimension.is_in_bounds(&[-2, -300]));
     }
 
     //noinspection ALL

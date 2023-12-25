@@ -20,8 +20,8 @@
  */
 
 use bevy::app::{App, Plugin, PluginGroup, PreStartup};
-use bevy::DefaultPlugins;
 use bevy::prelude::{Commands, Res};
+use bevy::DefaultPlugins;
 use bevy_ascii_terminal::{AutoCamera, Terminal, TerminalBundle, TerminalPlugin, ToWorld};
 
 use crate::core::app_state::AppState;
@@ -67,8 +67,7 @@ impl Plugin for BootstrapPlugin {
         // 3. Bootstrap systems
         // 4. States
         // 5. All other state plugins
-        app
-            .add_plugins(DefaultPlugins.set(window_config.provide_plugin()))
+        app.add_plugins(DefaultPlugins.set(window_config.provide_plugin()))
             .add_plugins(TerminalPlugin)
             .insert_resource(window_config)
             .insert_resource(InputConfig::load())
@@ -86,9 +85,7 @@ impl Plugin for BootstrapPlugin {
     }
 }
 
-/// # @System
-///
-/// Sets-up all of the game's required base components and bundles, 
+/// Sets-up all of the game's required base components and bundles,
 /// e.g., the world, rendering and camera.
 ///
 /// schedule: [PreStartup]
@@ -121,13 +118,11 @@ impl Plugin for BootstrapPlugin {
 /// * [WindowConfig]
 ///
 fn startup_system(mut commands: Commands, window_config: Res<WindowConfig>) {
-    let terminal_size: [i32; 2] = window_config
-        .terminal_size()
-        .as_array();
+    let terminal_size: [i32; 2] = window_config.terminal_size().as_array();
 
     commands.spawn((
         TerminalBundle::from(Terminal::new(terminal_size)),
         ToWorld::default(),
-        AutoCamera
+        AutoCamera,
     ));
 }

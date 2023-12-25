@@ -28,7 +28,8 @@
 //! Since: `0.1.5`
 //!
 
-pub mod coord_2d;
-pub mod player;
 pub mod ascii_sprite;
+pub mod coord_2d;
+pub mod fov;
 pub mod game_map;
+pub mod player;

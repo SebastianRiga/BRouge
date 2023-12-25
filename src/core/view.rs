@@ -21,6 +21,7 @@
 
 use bevy::prelude::Mut;
 use bevy_ascii_terminal::Terminal;
+use crate::core::var_args::VarArgs;
 
 use crate::core::position_2d::Position2d;
 
@@ -189,5 +190,5 @@ pub trait View {
     /// * [Terminal]
     /// * [Position2d]
     ///
-    fn render_at(&self, position: impl Position2d, terminal: &mut Mut<Terminal>);
+    fn render_at(&self, position: &impl Position2d, terminal: &mut Mut<Terminal>, options: &VarArgs);
 }
