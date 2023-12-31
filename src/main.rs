@@ -35,6 +35,7 @@ mod js;
 mod os;
 mod plugins;
 mod res;
+mod ui;
 
 pub fn main() {
     #[cfg(target_family = "wasm")]

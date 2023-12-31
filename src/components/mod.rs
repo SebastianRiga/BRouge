@@ -32,4 +32,5 @@ pub mod ascii_sprite;
 pub mod coord_2d;
 pub mod fov;
 pub mod game_map;
+pub mod game_terminal;
 pub mod player;

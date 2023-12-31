@@ -19,39 +19,35 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+use bevy::prelude::Component;
 use std::fmt::{Display, Formatter};
 
-use bevy::prelude::Component;
-
-/// Marker [Component] used to identify respective `entity` as the player / main actor of the game.
-///
-/// The resulting entity will be controllable by the player, fight monsters, end the game when it
-/// dies, etc.
+/// Marker [Component] which identifies the corresponding [bevy_ascii_terminal::Terminal] as the main game area, in
+/// which the `player` interacts with the world.
 ///
 /// # Examples
 ///
 /// ```
-/// commands.spawn((
-///     Coord2d::from_position(starting_position),
-///     ascii_sprite!('@', Color::ORANGE, Color::BLACK)
-/// )).insert(Player); // The spawned `entity` will be the main actor of the game.
+/// commands
+///     .spawn(
+///         TerminalBundle::from(Terminal::new(tile_count))
+///             .with_tile_scaling(TileScaling::World)
+///             .with_font(font),
+///     )
+///     .insert(GameTerminal);
 /// ```
 ///
 /// # About
 ///
 /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
 ///
-/// Since: `0.1.5`
-///
-/// # See also
-///
-/// * [crate::entities::player_factory::PlayerFactory]
+/// Since: `0.1.7`
 ///
 #[derive(Debug, Copy, Clone, Component)]
-pub struct Player;
+pub struct GameTerminal;
 
-impl Display for Player {
+impl Display for GameTerminal {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ECS -> Components -> Player")
+        write!(f, "ECS -> Components -> GameTerminal")
     }
 }

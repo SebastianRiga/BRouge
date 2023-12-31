@@ -19,22 +19,19 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+use std::fmt::{Display, Formatter};
+
 use bevy::prelude::Component;
 
 use crate::components::coord_2d::Coord2d;
 use crate::core::position_2d::Position2d;
 
+/// [Component] tracking the [Coord2d] based positions currently in the `field of view` of the associated `entity`.
+///
 /// # Properties
 ///
-/// * `radius`:
-/// * `is_dirty`:
-/// * `coordinates`:
-///
-/// # Examples
-///
-/// ```
-///
-/// ```
+/// * `radius`: The radius of the `field of view`.
+/// * `is_dirty`: If the `field of view` needs to be recalculated.
 ///
 /// # About
 ///
@@ -42,27 +39,26 @@ use crate::core::position_2d::Position2d;
 ///
 /// Since: `0.1.7`
 ///
-#[derive(Debug, Component)]
+#[derive(Debug, Clone, PartialEq, Component)]
 pub struct Fov {
+    /// The radius of the `field of view`.
     pub radius: i32,
+    /// If the `field of view` needs to be recalculated.
     pub is_dirty: bool,
+    /// (Private) List of [Coord2d] based positions currently in the `field of view`.
     coordinates: Vec<Coord2d>,
 }
 
 impl Fov {
+    /// Creates a new [Fov] instance with the passed `radius`.
     ///
+    /// The new instance's `is_dirty` flag is initially set to `true`, in order to trigger an immediate calculation.
     ///
     /// # Arguments
     ///
-    /// * `radius`:
+    /// * `radius`: The radius of the `field of view`.
     ///
     /// returns: [Fov]
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// let fov = Fov::new(8);
-    /// ```
     ///
     /// # About
     ///
@@ -78,19 +74,14 @@ impl Fov {
         }
     }
 
-    ///
+    /// Adds the passed `position` to the [Fov], marking it as in the `field of view`
+    /// of the associated `entity`.
     ///
     /// # Arguments
     ///
-    /// * `position`:
+    /// * `position`: The position to add.
     ///
     /// returns: ()
-    ///
-    /// # Examples
-    ///
-    /// ```
-    ///
-    /// ```
     ///
     /// # About
     ///
@@ -98,17 +89,11 @@ impl Fov {
     ///
     /// Since: `0.1.7`
     ///
-    pub fn mark_position_as_visible(&mut self, position: &impl Position2d) {
+    pub fn push_position(&mut self, position: &impl Position2d) {
         self.coordinates.push(Coord2d::from_position(position));
     }
 
     /// Removes all [Coord2d]s currently in the field of view, making it empty.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    ///
-    /// ```
     ///
     /// # About
     ///
@@ -118,5 +103,15 @@ impl Fov {
     ///
     pub fn clear(&mut self) {
         self.coordinates.clear();
+    }
+}
+
+impl Display for Fov {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ECS -> Components -> Fov(radius: {:?}, is_dirty: {:?}, coordinates: {:?})",
+            self.radius, self.is_dirty, self.coordinates
+        )
     }
 }

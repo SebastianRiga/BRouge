@@ -19,39 +19,35 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use std::fmt::{Display, Formatter};
+//! Defines the color pallet and color scheme of the game.
+//!
+//! Provides access to all general purpose and non-entity specific colors used in the game.
+//!
+//! # About
+//!
+//! Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+//!
+//! Since: `0.1.8`
+//!
 
-use bevy::prelude::Component;
+use bevy::prelude::Color;
 
-/// Marker [Component] used to identify respective `entity` as the player / main actor of the game.
-///
-/// The resulting entity will be controllable by the player, fight monsters, end the game when it
-/// dies, etc.
-///
-/// # Examples
-///
-/// ```
-/// commands.spawn((
-///     Coord2d::from_position(starting_position),
-///     ascii_sprite!('@', Color::ORANGE, Color::BLACK)
-/// )).insert(Player); // The spawned `entity` will be the main actor of the game.
-/// ```
+/// The default background color of the game.
 ///
 /// # About
 ///
 /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
 ///
-/// Since: `0.1.5`
+/// Since: `0.1.8`
 ///
-/// # See also
-///
-/// * [crate::entities::player_factory::PlayerFactory]
-///
-#[derive(Debug, Copy, Clone, Component)]
-pub struct Player;
+pub const BACKGROUND: Color = Color::BLACK;
 
-impl Display for Player {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ECS -> Components -> Player")
-    }
-}
+/// The standard color for inactive elements.
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.8`
+///
+pub const INACTIVE: Color = Color::DARK_GRAY;

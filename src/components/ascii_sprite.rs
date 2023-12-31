@@ -19,12 +19,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use bevy::prelude::{Color, Component, Mut};
-use bevy_ascii_terminal::{Terminal, TileFormatter};
+use std::fmt::{Display, Formatter};
 
-use crate::core::position_2d::Position2d;
-use crate::core::var_args::VarArgs;
-use crate::core::view::View;
+use bevy::prelude::{Color, Component};
+
+use crate::ui::colors;
+use crate::ui::tile::Tile;
 
 /// [Component] marking an `entity` as renderable sprite of the game, made up of an ascii symbol,
 /// a foreground and background color.
@@ -65,7 +65,7 @@ use crate::core::view::View;
 ///
 /// # See also
 ///
-/// * [View]
+/// * [Tile]
 /// * [crate::ascii_sprite]
 ///
 #[derive(Debug, Copy, Clone, PartialEq, Component)]
@@ -117,13 +117,38 @@ impl AsciiSprite {
     }
 }
 
-impl View for AsciiSprite {
-    fn render_at(&self, position: &impl Position2d, terminal: &mut Mut<Terminal>, _options: &VarArgs) {
-        terminal.put_char(
-            position.as_array(),
-            self.glyph
-                .fg(self.foreground_color)
-                .bg(self.background_color),
+impl Tile for AsciiSprite {
+    fn glyph(&self) -> char {
+        self.glyph
+    }
+
+    fn foreground_color(&self, _is_seen: bool, is_visible: bool) -> Color {
+        if is_visible {
+            self.foreground_color
+        } else {
+            colors::BACKGROUND
+        }
+    }
+
+    fn background_color(&self, _is_seen: bool, _is_visible: bool) -> Color {
+        self.background_color
+    }
+
+    fn has_collision(&self) -> bool {
+        true
+    }
+}
+
+impl Display for AsciiSprite {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ECS -> Component -> AsciiSprite(\
+        glyph: {:?}, \
+        foreground_color: {:?}, \
+        background_color: {:?}\
+        )",
+            self.glyph, self.foreground_color, self.background_color
         )
     }
 }

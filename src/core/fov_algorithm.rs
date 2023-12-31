@@ -23,18 +23,9 @@ use bevy::prelude::Mut;
 use log::info;
 
 use crate::components::fov::Fov;
-use crate::core::dimension_2d::Dimension2d;
 use crate::core::position_2d::Position2d;
-
-pub trait PlayArea2d: Dimension2d {
-    fn collides(&self, index: &impl Position2d) -> bool;
-
-    fn mark_tile_as_seen(&mut self, index: &impl Position2d);
-
-    fn mark_tile_as_visible(&mut self, index: &impl Position2d);
-
-    fn clear_visible_tiles(&mut self);
-}
+use crate::ui::tile::Tile;
+use crate::ui::tile_map::TileMap;
 
 ///
 ///
@@ -51,10 +42,10 @@ pub trait PlayArea2d: Dimension2d {
 /// ```
 ///
 /// ```
-pub fn field_of_view(
+pub fn field_of_view<T: Tile>(
     fov: &mut Mut<Fov>,
     position: &impl Position2d,
-    area: &mut Mut<impl PlayArea2d>,
+    area: &mut Mut<impl TileMap<T>>,
 ) {
     if !fov.is_dirty {
         return;
@@ -68,10 +59,10 @@ pub fn field_of_view(
     );
 
     fov.clear();
-    area.clear_visible_tiles();
+    area.reset_visible_tiles();
 
     area.mark_tile_as_seen(position);
-    fov.mark_position_as_visible(position);
+    fov.push_position(position);
 
     for x in (position.x_coordinate() - fov.radius)..(position.x_coordinate() + fov.radius) {
         for y in (position.y_coordinate() - fov.radius)..(position.y_coordinate() + fov.radius) {
@@ -83,7 +74,7 @@ pub fn field_of_view(
             {
                 area.mark_tile_as_seen(&target);
                 area.mark_tile_as_visible(&target);
-                fov.mark_position_as_visible(&target);
+                fov.push_position(&target);
             }
         }
     }
@@ -127,10 +118,10 @@ fn calculate_distance(start: &impl Position2d, end: &impl Position2d) -> i32 {
 /// ```
 ///
 /// ```
-fn is_in_line_of_sight(
+fn is_in_line_of_sight<T: Tile>(
     start: &impl Position2d,
     end: &impl Position2d,
-    area: &Mut<impl PlayArea2d>,
+    area: &Mut<impl TileMap<T>>,
 ) -> bool {
     let mut delta = start.delta(end);
     let delta_signed = get_offset_delta(&delta);
@@ -160,12 +151,12 @@ fn is_in_line_of_sight(
 /// ```
 ///
 /// ```
-fn calculate_horizontal_slope_in_line_of_sight(
+fn calculate_horizontal_slope_in_line_of_sight<T: Tile>(
     start: &impl Position2d,
     end: &impl Position2d,
     delta: &impl Position2d,
     delta_signed: &impl Position2d,
-    area: &Mut<impl PlayArea2d>,
+    area: &Mut<impl TileMap<T>>,
 ) -> bool {
     let mut x = end.x_coordinate();
     let mut y = end.y_coordinate();
@@ -184,7 +175,7 @@ fn calculate_horizontal_slope_in_line_of_sight(
             return true;
         }
 
-        if area.collides(&[x, y]) {
+        if area.tile_has_collision(&[x, y]) {
             break;
         }
     }
@@ -209,12 +200,12 @@ fn calculate_horizontal_slope_in_line_of_sight(
 /// ```
 ///
 /// ```
-fn calculate_vertical_slope_in_line_of_sight(
+fn calculate_vertical_slope_in_line_of_sight<T: Tile>(
     start: &impl Position2d,
     end: &impl Position2d,
     delta: &impl Position2d,
     delta_signed: &impl Position2d,
-    area: &Mut<impl PlayArea2d>,
+    area: &Mut<impl TileMap<T>>,
 ) -> bool {
     let mut x = end.x_coordinate();
     let mut y = end.y_coordinate();
@@ -233,7 +224,7 @@ fn calculate_vertical_slope_in_line_of_sight(
             return true;
         }
 
-        if area.collides(&[x, y]) {
+        if area.tile_has_collision(&[x, y]) {
             break;
         }
     }

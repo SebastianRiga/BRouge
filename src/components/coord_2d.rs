@@ -20,6 +20,7 @@
  */
 
 use std::cmp::{max, min};
+use std::fmt::{Display, Formatter};
 
 use bevy::prelude::Component;
 
@@ -251,6 +252,16 @@ impl Coord2d {
     ///
     pub fn right(&self, upper_bound: i32) -> Self {
         Coord2d::new(min(self.x + 1, upper_bound), self.y)
+    }
+}
+
+impl Display for Coord2d {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ECS -> Component -> Coord2d(x: {:?}, y: {:?})",
+            self.x, self.y
+        )
     }
 }
 

@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//! Exposes functionality to create and manage all entities for the game.
+//! Exposes factories and functionality to create and manage all entities for the game.
 //!
 //! # About
 //!
@@ -28,4 +28,5 @@
 //! Since: `0.1.5`
 //!
 
-pub mod player_bundle;
+pub mod player_factory;
+pub mod terminal_factory;

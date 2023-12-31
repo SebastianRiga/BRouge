@@ -20,18 +20,19 @@
  */
 
 use bevy::app::{App, Plugin, PluginGroup, PreStartup};
-use bevy::prelude::{Commands, Res};
+use bevy::prelude::{ClearColor, Commands, Res};
 use bevy::DefaultPlugins;
-use bevy_ascii_terminal::{AutoCamera, Terminal, TerminalBundle, TerminalPlugin, ToWorld};
+use bevy_ascii_terminal::{TerminalFont, TerminalPlugin};
 
-use crate::core::app_state::AppState;
-use crate::core::dimension_2d::Dimension2d;
-use crate::core::plugin_provider::PluginProvider;
+use crate::entities::terminal_factory::TerminalFactory;
+use crate::plugins::app_state::AppState;
 use crate::plugins::game_state_plugin::GameStatePlugin;
+use crate::plugins::plugin_provider::PluginProvider;
 use crate::res::config_file::ConfigFile;
 use crate::res::input_config::InputConfig;
 use crate::res::window_config;
 use crate::res::window_config::WindowConfig;
+use crate::ui::colors;
 
 /// Initial entrypoint [Plugin] of the game.
 ///
@@ -69,6 +70,8 @@ impl Plugin for BootstrapPlugin {
         // 5. All other state plugins
         app.add_plugins(DefaultPlugins.set(window_config.provide_plugin()))
             .add_plugins(TerminalPlugin)
+            // Overwrite window clear color to set default background.
+            .insert_resource(ClearColor(colors::BACKGROUND))
             .insert_resource(window_config)
             .insert_resource(InputConfig::load())
             .add_systems(PreStartup, startup_system)
@@ -118,11 +121,9 @@ impl Plugin for BootstrapPlugin {
 /// * [WindowConfig]
 ///
 fn startup_system(mut commands: Commands, window_config: Res<WindowConfig>) {
-    let terminal_size: [i32; 2] = window_config.terminal_size().as_array();
-
-    commands.spawn((
-        TerminalBundle::from(Terminal::new(terminal_size)),
-        ToWorld::default(),
-        AutoCamera,
-    ));
+    TerminalFactory::spawn(
+        &mut commands,
+        TerminalFont::ZxEvolution8x8,
+        &window_config.terminal_size(),
+    );
 }

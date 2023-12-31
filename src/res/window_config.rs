@@ -19,6 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+use std::fmt::{Display, Formatter};
+
 use bevy::prelude::Resource;
 use bevy::utils::default;
 use bevy::window::{MonitorSelection, Window, WindowPlugin, WindowPosition, WindowResolution};
@@ -26,7 +28,7 @@ use serde::Deserialize;
 
 use crate::core::constants;
 use crate::core::dimension_2d::Dimension2d;
-use crate::core::plugin_provider::PluginProvider;
+use crate::plugins::plugin_provider::PluginProvider;
 use crate::res::config_file::ConfigFile;
 
 /// A [bevy::prelude::Resource] for configuring and creating the display [Window] of the game.
@@ -60,7 +62,7 @@ use crate::res::config_file::ConfigFile;
 ///     .run()
 /// ```
 ///
-/// ## Usage
+/// # Examples
 ///
 /// ```
 /// fn some_system(window_config: Res<InputConfig>, ...) {
@@ -164,6 +166,19 @@ impl WindowConfig {
     }
 }
 
+impl Display for WindowConfig {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "WindowConfig(width: {:?}, height: {:?}, resizable: {:?}, position: {:?})",
+            self.width,
+            self.height,
+            self.resizeable,
+            self.get_position()
+        )
+    }
+}
+
 impl PluginProvider<WindowPlugin> for WindowConfig {
     fn provide_plugin(&self) -> WindowPlugin {
         WindowPlugin {
@@ -240,7 +255,7 @@ mod unit_tests {
         assert_eq!(constants::TITLE, primary_window.title);
         assert_eq!(
             primary_window.resolution,
-            WindowResolution::new(window_config.width as f32, window_config.height as f32,)
+            WindowResolution::new(window_config.width as f32, window_config.height as f32)
         );
         assert_eq!(window_config.resizeable, primary_window.resizable);
         assert_eq!(window_config.get_position(), primary_window.position);

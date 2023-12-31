@@ -19,6 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+use std::fmt::{Display, Formatter};
+
 use bevy::prelude::{KeyCode, Resource};
 use serde::Deserialize;
 
@@ -202,6 +204,16 @@ impl InputConfig {
             _ if self.cancel == key_code => Some(InputType::Cancel),
             _ => None,
         }
+    }
+}
+
+impl Display for InputConfig {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "InputConfig(up: {:?}, left: {:?}, down: {:?}, right: {:?}, cancel: {:?})",
+            self.up, self.left, self.down, self.right, self.cancel
+        )
     }
 }
 

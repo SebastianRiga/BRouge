@@ -33,16 +33,17 @@ use crate::components::ascii_sprite::AsciiSprite;
 use crate::components::coord_2d::Coord2d;
 use crate::components::fov::Fov;
 use crate::components::game_map::GameMap;
+use crate::components::game_terminal::GameTerminal;
 use crate::components::player::Player;
-use crate::core::app_state::AppState;
 use crate::core::dimension_2d::Dimension2d;
-use crate::core::fov_algorithm::{field_of_view, PlayArea2d};
+use crate::core::fov_algorithm::field_of_view;
 use crate::core::position_2d::Position2d;
-use crate::core::var_args::VarArgs;
-use crate::core::view::{View, ViewGroup};
-use crate::entities::player_bundle::PlayerBundle;
+use crate::entities::player_factory::PlayerFactory;
+use crate::plugins::app_state::AppState;
 use crate::res::input_config::{InputConfig, InputType};
 use crate::res::window_config::WindowConfig;
+use crate::ui::tile::Tile;
+use crate::ui::tile_map::TileMap;
 
 /// Plugin coupled with the [AppState::Game] state, which makes up the main gameplay state.
 /// In it the user moves the `player entity`, fights or otherwise interacts with the game.
@@ -98,10 +99,10 @@ impl Plugin for GameStatePlugin {
 ///
 fn startup_system(mut commands: Commands, window_config: Res<WindowConfig>) {
     let game_map = GameMap::new(window_config.terminal_size());
-    let starting_position = game_map.rooms.first().unwrap().center();
+    let starting_position = game_map.rooms().first().unwrap().center();
 
     commands.spawn(game_map);
-    PlayerBundle::spawn(&mut commands, &starting_position);
+    PlayerFactory::spawn(&mut commands, &starting_position);
 }
 
 /// System to handle user's input through any of the connected peripherals like the keyboard or mouse.
@@ -151,6 +152,21 @@ fn input_system(
     }
 }
 
+/// System to calculate and update the `player`'s `field of view`, as the `player` traverses the game's world.
+///
+/// # Arguments
+///
+/// * `game_map_query`: [Query] required to retrieve the game map for the `field of view` calculation.
+/// * `fov_query`: [Query] required to retrieve and update the `player`'s `field of view` component.
+///
+/// returns: ()
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.7`
+///
 fn fov_system(
     mut game_map_query: Query<&mut GameMap>,
     mut fov_query: Query<(&mut Fov, &Coord2d), With<Player>>,
@@ -183,9 +199,9 @@ fn fov_system(
 /// * [AsciiSprite]
 ///
 fn render_system(
-    mut terminal_query: Query<&mut Terminal>,
+    mut terminal_query: Query<&mut Terminal, With<GameTerminal>>,
     game_map_query: Query<&GameMap>,
-    render_query: Query<(&mut Coord2d, &mut AsciiSprite)>,
+    player_query: Query<(&mut Coord2d, &mut AsciiSprite), With<Player>>,
 ) {
     let mut terminal = terminal_query.single_mut();
 
@@ -193,8 +209,8 @@ fn render_system(
 
     game_map_query.single().render(&mut terminal);
 
-    for (coord, sprite) in render_query.iter() {
-        sprite.render_at(&coord.as_array(), &mut terminal, &VarArgs::new());
+    for (coord, sprite) in player_query.iter() {
+        sprite.render(&coord.as_array(), &mut terminal, true, true);
     }
 }
 
@@ -279,7 +295,7 @@ fn handle_player_movement(
         _ => Coord2d::from_position(&[player_position.x, player_position.y]),
     };
 
-    if game_map.collides(&new_position) {
+    if game_map.tile_has_collision(&new_position) {
         return;
     }
 
@@ -321,7 +337,7 @@ mod tests {
             app.world
                 .query::<&GameMap>()
                 .single(&app.world)
-                .rooms
+                .rooms()
                 .first()
                 .unwrap()
                 .center()
@@ -353,6 +369,18 @@ mod tests {
 
         let window = app.world.spawn(DummyComponent).id();
 
+        #[allow(unused_assignments)]
+        let mut player_coord: Coord2d = Coord2d::new(0, 0);
+
+        app.update();
+
+        {
+            player_coord = *app
+                .world
+                .query_filtered::<&Coord2d, With<Player>>()
+                .single(&app.world);
+        }
+
         app.world.send_event(KeyboardInput {
             scan_code: 32,
             key_code: Some(KeyCode::W),
@@ -362,8 +390,10 @@ mod tests {
 
         app.update();
 
+        player_coord = player_coord.up(640);
+
         assert_eq!(
-            &Coord2d::new(50, 41),
+            &player_coord,
             app.world
                 .query::<(&Coord2d, With<Player>)>()
                 .single(&app.world)
@@ -381,8 +411,10 @@ mod tests {
 
         app.update();
 
+        player_coord = player_coord.left(0);
+
         assert_eq!(
-            &Coord2d::new(49, 41),
+            &player_coord,
             app.world
                 .query::<(&Coord2d, With<Player>)>()
                 .single(&app.world)
@@ -400,8 +432,10 @@ mod tests {
 
         app.update();
 
+        player_coord = player_coord.down(0);
+
         assert_eq!(
-            &Coord2d::new(49, 40),
+            &player_coord,
             app.world
                 .query::<(&Coord2d, With<Player>)>()
                 .single(&app.world)
@@ -419,8 +453,10 @@ mod tests {
 
         app.update();
 
+        player_coord = player_coord.right(800);
+
         assert_eq!(
-            &Coord2d::new(50, 40),
+            &player_coord,
             app.world
                 .query::<(&Coord2d, With<Player>)>()
                 .single(&app.world)
@@ -439,13 +475,16 @@ mod tests {
         app.update();
 
         assert_eq!(
-            &Coord2d::new(50, 40),
+            &player_coord,
             app.world
                 .query::<(&Coord2d, With<Player>)>()
                 .single(&app.world)
                 .0
         );
     }
+
+    #[test]
+    fn test_fov_system() {}
 
     #[test]
     fn test_render_system() {
@@ -456,13 +495,21 @@ mod tests {
         app.add_systems(Update, render_system);
 
         app.world
-            .spawn(TerminalBundle::from(Terminal::new([100, 80])));
+            .spawn(TerminalBundle::from(Terminal::new([100, 80])))
+            .insert(GameTerminal);
 
         app.update();
 
-        let terminal = app.world.query::<&Terminal>().single(&app.world);
+        let game_map = app.world.query::<&GameMap>().single(&app.world);
+        let center_coord = game_map.rooms().first().unwrap().center();
 
-        assert_eq!('@', terminal.get_char([50, 40]));
+        assert_eq!(
+            '@',
+            app.world
+                .query::<&Terminal>()
+                .single(&app.world)
+                .get_char(center_coord)
+        )
     }
 
     #[test]

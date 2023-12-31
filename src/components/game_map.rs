@@ -19,18 +19,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use bevy::prelude::{Component, Mut};
-use bevy_ascii_terminal::Terminal;
+use std::fmt::{Display, Formatter};
+
+use bevy::prelude::Component;
 
 use crate::core::constants;
 use crate::core::dimension_2d::Dimension2d;
-use crate::core::fov_algorithm::PlayArea2d;
 use crate::core::position_2d::Position2d;
-use crate::core::rectangle::Rectangle;
 use crate::core::rng::RandomNumberGenerator;
-use crate::core::tile::TileType;
-use crate::core::var_args::VarArgs;
-use crate::core::view::{View, ViewGroup};
+use crate::ui::rectangle::Rectangle;
+use crate::ui::tile::{MapTile, Tile};
+use crate::ui::tile_map::TileMap;
 
 /// A map making up a level of the game, which the `player` can traverse and explore.
 ///
@@ -40,10 +39,6 @@ use crate::core::view::{View, ViewGroup};
 ///
 /// * `width`: The real width of the map.
 /// * `height`: The real height of the map.
-/// * `tiles`: (Private) List of all tiles which make up the map as a linear vector.
-/// * `seen_tiles`: (Private) List of all tiles which the player has seen before,
-/// e.g., which were in his FOV at least once.
-/// * `visible_tiles`: (Private) List of all tiles which the player currently sees, as defined by their FOV.
 ///
 /// # Examples
 ///
@@ -73,10 +68,10 @@ pub struct GameMap {
     pub width: i32,
     /// The real height of the map.
     pub height: i32,
-    /// List of all rooms on the map in form of [Rectangle]s.
-    pub rooms: Vec<Rectangle>,
+    /// (Private) List of all rooms on the map in form of [Rectangle]s.
+    rooms: Vec<Rectangle>,
     /// (Private) List of all tiles which make up the map as a linear vector.
-    tiles: Vec<TileType>,
+    tiles: Vec<MapTile>,
     /// (Private) List of all tiles which the player has seen before, e.g., which were in his FOV at least once.
     seen_tiles: Vec<bool>,
     /// (Private) List of all tiles which the player currently sees, as defined by their FOV.
@@ -115,7 +110,7 @@ impl GameMap {
             width,
             height,
             rooms: Vec::new(),
-            tiles: vec![TileType::Wall; area],
+            tiles: vec![MapTile::default(); area],
             seen_tiles: vec![false; area],
             visible_tiles: vec![false; area],
         };
@@ -147,73 +142,60 @@ impl GameMap {
             }
 
             room.add_to_map(&mut map);
+            map.rooms.push(room);
         }
 
         map
     }
 
-    ///
+    /// Returns an immutable [Vec] reference containing all the rooms on the map as [Rectangle] instances.
     ///
     /// # Arguments
     ///
-    /// * `index`:
-    /// * `tile_type`:
-    ///
-    /// returns: ()
+    /// returns: &[Vec]<[Rectangle]>
     ///
     /// # Examples
     ///
     /// ```
-    ///
-    /// ```
-    pub fn set_tile_at(&mut self, index: &impl Position2d, tile_type: TileType) {
-        self.tiles[Self::convert_world_index(self.width, index)] = tile_type;
-    }
-
-    ///
-    ///
-    /// # Arguments
-    ///
-    /// * `width`: The width of the map
-    /// * `index`:
-    ///
-    /// returns: usize
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// // Internally the game map uses a linear vector to store the tiles of size `width * height`, e.g., 80 * 50.
     /// let map = GameMap::new([80, 50]);
     ///
-    /// // Internally the passed position is converted to index `3225` in the linear index.
-    /// map.get_tile_at([40, 25]);
+    /// ...
+    ///
+    /// for room in map.rooms().iter() {
+    ///     // Use the room
+    /// }
     /// ```
     ///
     /// # About
     ///
     /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
     ///
-    /// Since: `0.1.7`
+    /// Since: `0.1.8`
     ///
-    fn convert_world_index(width: i32, index: &impl Position2d) -> usize {
-        (index.y_coordinate() as usize * width as usize) + index.x_coordinate() as usize
+    pub fn rooms(&self) -> &Vec<Rectangle> {
+        &self.rooms
     }
 }
 
-impl ViewGroup for GameMap {
-    fn render(&self, terminal: &mut Mut<Terminal>) {
-        for x in 0..self.width {
-            for y in 0..self.height {
-                let index = Self::convert_world_index(self.width, &[x, y]);
-                self.tiles[index].render_at(
-                    &[x, y],
-                    terminal,
-                    VarArgs::new()
-                        .insert("visible", self.visible_tiles[index])
-                        .insert("seen", self.seen_tiles[index]),
-                );
-            }
-        }
+impl Display for GameMap {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ECS -> Components -> GameMap(\
+            width: {:?}, \
+            height: {:?}, \
+            rooms: {:?}, \
+            tiles: {:?}, \
+            seen_tiles: {:?}, \
+            visible_tiles. {:?}\
+            )",
+            self.width,
+            self.height,
+            self.rooms,
+            self.tiles,
+            self.seen_tiles,
+            self.visible_tiles
+        )
     }
 }
 
@@ -227,20 +209,36 @@ impl Dimension2d for GameMap {
     }
 }
 
-impl PlayArea2d for GameMap {
-    fn collides(&self, index: &impl Position2d) -> bool {
-        self.tiles[Self::convert_world_index(self.width, index)] == TileType::Wall
+impl TileMap<MapTile> for GameMap {
+    fn tiles(&self) -> &Vec<MapTile> {
+        &self.tiles
+    }
+
+    fn tiles_mut(&mut self) -> &mut Vec<MapTile> {
+        &mut self.tiles
+    }
+
+    fn tile_has_collision(&self, index: &impl Position2d) -> bool {
+        self.get_tile_at(index).has_collision()
+    }
+
+    fn is_tile_seen(&self, index: &impl Position2d) -> bool {
+        self.seen_tiles[Self::convert_world_index(self.width, index)]
     }
 
     fn mark_tile_as_seen(&mut self, index: &impl Position2d) {
         self.seen_tiles[Self::convert_world_index(self.width, index)] = true
     }
 
+    fn is_tile_visible(&self, index: &impl Position2d) -> bool {
+        self.visible_tiles[Self::convert_world_index(self.width, index)]
+    }
+
     fn mark_tile_as_visible(&mut self, index: &impl Position2d) {
         self.visible_tiles[Self::convert_world_index(self.width, index)] = true
     }
 
-    fn clear_visible_tiles(&mut self) {
+    fn reset_visible_tiles(&mut self) {
         self.visible_tiles.clear();
         self.visible_tiles.resize(self.area(), false);
     }

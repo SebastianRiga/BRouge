@@ -37,5 +37,7 @@
 //! Since: `0.1.5`
 //!
 
+pub mod app_state;
 pub mod bootstrap_plugin;
 pub mod game_state_plugin;
+pub mod plugin_provider;
