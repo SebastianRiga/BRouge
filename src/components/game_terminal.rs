@@ -20,7 +20,7 @@
  */
 
 use bevy::prelude::Component;
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
 /// Marker [Component] which identifies the corresponding [bevy_ascii_terminal::Terminal] as the main game area, in
 /// which the `player` interacts with the world.
@@ -43,11 +43,17 @@ use std::fmt::{Display, Formatter};
 ///
 /// Since: `0.1.7`
 ///
-#[derive(Debug, Copy, Clone, Component)]
+#[derive(Copy, Clone, Component)]
 pub struct GameTerminal;
+
+impl Debug for GameTerminal {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ECS -> Components -> GameTerminal {{ (Marker) }}")
+    }
+}
 
 impl Display for GameTerminal {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ECS -> Components -> GameTerminal")
+        write!(f, "Marker(GameTerminal)")
     }
 }

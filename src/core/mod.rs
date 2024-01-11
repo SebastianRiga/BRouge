@@ -28,8 +28,8 @@
 //! Since: `0.1.5`
 //!
 
+pub mod algorithm;
 pub mod constants;
 pub mod dimension_2d;
-pub mod fov_algorithm;
 pub mod position_2d;
 pub mod rng;

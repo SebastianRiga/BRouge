@@ -256,7 +256,7 @@ impl Display for Rectangle {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Rectangle(origin: (x: {:?}, y: {:?}), dimension: ( width: {:?}, height: {:?}))",
+            "(({}, {}), ({}, {}))",
             self.left,
             self.bottom,
             self.right - self.left,
@@ -281,11 +281,12 @@ impl Dimension2d for Rectangle {
 
 #[cfg(test)]
 mod tests {
-    use crate::components::game_map::GameMap;
     use crate::core::dimension_2d::Dimension2d;
+    use crate::ui::game_map::GameMap;
     use crate::ui::rectangle::Rectangle;
     use crate::ui::tile::Tile;
     use crate::ui::tile_map::TileMap;
+    use crate::ui::tile_map_layout_generator::BaseTileMapGenerator;
 
     #[test]
     fn test_collision() {
@@ -300,7 +301,7 @@ mod tests {
 
     #[test]
     fn rooms_are_added_to_map_correctly() {
-        let mut map = GameMap::new([80, 50]);
+        let mut map = GameMap::new(&[80, 50], &BaseTileMapGenerator);
         let rect = Rectangle::new([0, 0], [5, 5]);
 
         rect.add_to_map(&mut map);
@@ -314,7 +315,7 @@ mod tests {
 
     #[test]
     fn rooms_are_connected_correctly() {
-        let mut map = GameMap::new([80, 50]);
+        let mut map = GameMap::new(&[80, 50], &BaseTileMapGenerator);
         let rect1 = Rectangle::new([0, 0], [5, 5]);
         let rect2 = Rectangle::new([6, 6], [5, 5]);
 

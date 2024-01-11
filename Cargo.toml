@@ -1,7 +1,7 @@
 [package]
 name = "b_rouge"
 description = "The goal of this project is to create a classic rougelike inspired game in Rust using bevy."
-version = "0.1.5"
+version = "0.1.9"
 edition = "2021"
 authors = ["Sebastian Riga"]
 categories = ["game-development", "games"]
@@ -10,12 +10,6 @@ license-file = "LICENSE.md"
 rust-version = "1.71.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[profile.dev]
-opt-level = 1
-
-[profile.dev.package."*"]
-opt-level = 3
 
 [dependencies]
 bevy = { version = "0.12.0", features = ["serialize"] }

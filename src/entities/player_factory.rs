@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
 use bevy::prelude::{Color, Commands, Entity};
 
@@ -27,6 +27,7 @@ use crate::ascii_sprite;
 use crate::components::coord_2d::Coord2d;
 use crate::components::fov::Fov;
 use crate::components::player::Player;
+use crate::components::state_label::GameStateLabel;
 use crate::core::position_2d::Position2d;
 use crate::ui::colors;
 
@@ -38,7 +39,6 @@ use crate::ui::colors;
 ///
 /// Since: `0.1.5`
 ///
-#[derive(Debug)]
 pub struct PlayerFactory;
 
 impl PlayerFactory {
@@ -72,13 +72,19 @@ impl PlayerFactory {
                 ascii_sprite!('@', Color::ORANGE, colors::BACKGROUND),
                 Fov::new(8),
             ))
-            .insert(Player)
+            .insert((Player, GameStateLabel))
             .id()
+    }
+}
+
+impl Debug for PlayerFactory {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ECS -> Entities -> PlayerFactory")
     }
 }
 
 impl Display for PlayerFactory {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ECS -> Entities -> PlayerFactory")
+        write!(f, "PlayerFactory")
     }
 }

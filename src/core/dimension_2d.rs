@@ -37,6 +37,10 @@ use crate::core::position_2d::Position2d;
 /// * `[i32; 2]`
 /// * `[f32; 2]`
 /// * `[usize; 2]`
+/// * `(i32, i32)`
+/// * `(i32, i32)`
+/// * `(f32, f32)`
+/// * `(usize, usize)`
 ///
 /// # Examples
 ///
@@ -156,7 +160,7 @@ pub trait Dimension2d: Debug + Clone {
     }
 }
 
-/// Internal macro to generate the [Dimension2d] trait implementations for existing types.
+/// Internal macro to generate the [Dimension2d] trait implementations for existing array index-able types.
 ///
 /// # About
 ///
@@ -164,7 +168,7 @@ pub trait Dimension2d: Debug + Clone {
 ///
 /// Since: `0.1.5`
 ///
-macro_rules! implement_dimension_2d {
+macro_rules! implement_dimension_2d_for_array {
     ($type:ty) => {
         impl Dimension2d for $type {
             fn width(&self) -> i32 {
@@ -178,13 +182,40 @@ macro_rules! implement_dimension_2d {
     };
 }
 
-implement_dimension_2d!(Vec2);
-implement_dimension_2d!(IVec2);
-implement_dimension_2d!(UVec2);
-implement_dimension_2d!([i32; 2]);
-implement_dimension_2d!([f32; 2]);
-implement_dimension_2d!([u32; 2]);
-implement_dimension_2d!([usize; 2]);
+implement_dimension_2d_for_array!(Vec2);
+implement_dimension_2d_for_array!(IVec2);
+implement_dimension_2d_for_array!(UVec2);
+implement_dimension_2d_for_array!([i32; 2]);
+implement_dimension_2d_for_array!([f32; 2]);
+implement_dimension_2d_for_array!([u32; 2]);
+implement_dimension_2d_for_array!([usize; 2]);
+
+/// Internal macro to generate the [Dimension2d] trait implementations for tuple types.
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.9`
+///
+macro_rules! implement_dimension_2d_for_tuple {
+    ($type:ty) => {
+        impl Dimension2d for $type {
+            fn width(&self) -> i32 {
+                self.0 as i32
+            }
+
+            fn height(&self) -> i32 {
+                self.1 as i32
+            }
+        }
+    };
+}
+
+implement_dimension_2d_for_tuple!((u32, u32));
+implement_dimension_2d_for_tuple!((i32, i32));
+implement_dimension_2d_for_tuple!((f32, f32));
+implement_dimension_2d_for_tuple!((usize, usize));
 
 #[cfg(test)]
 mod tests {
@@ -199,6 +230,10 @@ mod tests {
     const I32_ARRAY: [i32; 2] = [80, 50];
     const F32_ARRAY: [f32; 2] = [80.0f32, 50.0f32];
     const USIZE_ARRAY: [usize; 2] = [80usize, 50usize];
+    const U_TUPLE: (u32, u32) = (80u32, 50u32);
+    const I_TUPLE: (i32, i32) = (80, 50);
+    const F_TUPLE: (f32, f32) = (80.0f32, 50.0f32);
+    const USIZE_TUPLE: (usize, usize) = (80usize, 50usize);
 
     #[test]
     fn test_computed_properties() {
@@ -209,6 +244,10 @@ mod tests {
         assert_eq!(80, I32_ARRAY.width());
         assert_eq!(80, F32_ARRAY.width());
         assert_eq!(80, USIZE_ARRAY.width());
+        assert_eq!(80, U_TUPLE.width());
+        assert_eq!(80, I_TUPLE.width());
+        assert_eq!(80, F_TUPLE.width());
+        assert_eq!(80, USIZE_TUPLE.width());
 
         assert_eq!(50, VEC2.height());
         assert_eq!(50, I_VEC2.height());
@@ -217,6 +256,10 @@ mod tests {
         assert_eq!(50, I32_ARRAY.height());
         assert_eq!(50, F32_ARRAY.height());
         assert_eq!(50, USIZE_ARRAY.height());
+        assert_eq!(50, U_TUPLE.height());
+        assert_eq!(50, I_TUPLE.height());
+        assert_eq!(50, F_TUPLE.height());
+        assert_eq!(50, USIZE_TUPLE.height());
     }
 
     #[test]
@@ -228,6 +271,10 @@ mod tests {
         assert_eq!([40, 25], I32_ARRAY.center());
         assert_eq!([40, 25], F32_ARRAY.center());
         assert_eq!([40, 25], USIZE_ARRAY.center());
+        assert_eq!([40, 25], U_TUPLE.center());
+        assert_eq!([40, 25], I_TUPLE.center());
+        assert_eq!([40, 25], F_TUPLE.center());
+        assert_eq!([40, 25], USIZE_TUPLE.center());
     }
 
     #[test]
@@ -239,6 +286,10 @@ mod tests {
         assert_eq!(4000, I32_ARRAY.area());
         assert_eq!(4000, F32_ARRAY.area());
         assert_eq!(4000, USIZE_ARRAY.area());
+        assert_eq!(4000, U_TUPLE.area());
+        assert_eq!(4000, I_TUPLE.area());
+        assert_eq!(4000, F_TUPLE.area());
+        assert_eq!(4000, USIZE_TUPLE.area());
     }
 
     #[test]
@@ -261,5 +312,9 @@ mod tests {
         assert_eq!([80, 50], I32_ARRAY.as_array());
         assert_eq!([80, 50], F32_ARRAY.as_array());
         assert_eq!([80, 50], USIZE_ARRAY.as_array());
+        assert_eq!([80, 50], U_TUPLE.as_array());
+        assert_eq!([80, 50], I_TUPLE.as_array());
+        assert_eq!([80, 50], F_TUPLE.as_array());
+        assert_eq!([80, 50], USIZE_TUPLE.as_array());
     }
 }

@@ -152,19 +152,13 @@ impl RandomNumberGenerator {
     /// Since: `0.1.7`
     ///
     pub fn roll_dice(&mut self, number: i32, faces: i32) -> i32 {
-        let mut sum = 0;
-
-        for _ in 0..number {
-            sum += self.generator.gen_range(1..=faces)
-        }
-
-        sum
+        (0..number).fold(0, |sum, _| sum + self.generator.gen_range(1..=faces))
     }
 }
 
 impl Display for RandomNumberGenerator {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "RandomNumberGenerator(generator: {:?}))", self.generator)
+        write!(f, "({:?})", self.generator)
     }
 }
 

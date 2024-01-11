@@ -20,7 +20,7 @@
  */
 
 use std::cmp::{max, min};
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
 use bevy::prelude::Component;
 
@@ -57,7 +57,7 @@ use crate::core::position_2d::Position2d;
 ///
 /// Since: `0.1.5`
 ///
-#[derive(Debug, Copy, Clone, PartialEq, Component)]
+#[derive(Copy, Clone, PartialEq, Component)]
 pub struct Coord2d {
     /// The location of the coordinate on the horizontal x-axis.
     pub x: i32,
@@ -255,13 +255,19 @@ impl Coord2d {
     }
 }
 
-impl Display for Coord2d {
+impl Debug for Coord2d {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "ECS -> Component -> Coord2d(x: {:?}, y: {:?})",
+            "ECS -> Component -> Coord2d {{ x: {:?}, y: {:?} }}",
             self.x, self.y
         )
+    }
+}
+
+impl Display for Coord2d {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
     }
 }
 

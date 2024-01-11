@@ -19,10 +19,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
-use bevy::prelude::{Color, Component};
+use bevy::prelude::{Color, Component, Mut};
+use bevy_ascii_terminal::{Terminal, TileFormatter};
 
+use crate::core::position_2d::Position2d;
 use crate::ui::colors;
 use crate::ui::tile::Tile;
 
@@ -68,7 +70,7 @@ use crate::ui::tile::Tile;
 /// * [Tile]
 /// * [crate::ascii_sprite]
 ///
-#[derive(Debug, Copy, Clone, PartialEq, Component)]
+#[derive(Copy, Clone, PartialEq, Component)]
 pub struct AsciiSprite {
     /// The ascii symbol to use when rendering the `entity` on screen, e.g., '@'.
     pub glyph: char,
@@ -117,6 +119,30 @@ impl AsciiSprite {
     }
 }
 
+impl Debug for AsciiSprite {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ECS -> Component -> AsciiSprite{{\
+            glyph: {:?}, \
+            foreground_color: {:?}, \
+            background_color: {:?}\
+            }})",
+            self.glyph, self.foreground_color, self.background_color
+        )
+    }
+}
+
+impl Display for AsciiSprite {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "({:?}, {:?}, {:?})",
+            self.glyph, self.foreground_color, self.background_color
+        )
+    }
+}
+
 impl Tile for AsciiSprite {
     fn glyph(&self) -> char {
         self.glyph
@@ -137,19 +163,22 @@ impl Tile for AsciiSprite {
     fn has_collision(&self) -> bool {
         true
     }
-}
 
-impl Display for AsciiSprite {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "ECS -> Component -> AsciiSprite(\
-        glyph: {:?}, \
-        foreground_color: {:?}, \
-        background_color: {:?}\
-        )",
-            self.glyph, self.foreground_color, self.background_color
-        )
+    fn render(
+        &self,
+        position: &impl Position2d,
+        terminal: &mut Mut<Terminal>,
+        _is_seen: bool,
+        is_visible: bool,
+    ) {
+        if is_visible {
+            terminal.put_char(
+                position.as_array(),
+                self.glyph
+                    .fg(self.foreground_color)
+                    .bg(self.background_color),
+            )
+        }
     }
 }
 
@@ -199,7 +228,7 @@ macro_rules! ascii_sprite {
         $crate::components::ascii_sprite::AsciiSprite::new(
             $glyph,
             $foreground_color,
-            bevy::prelude::Color::WHITE,
+            bevy::prelude::Color::BLACK,
         )
     };
     ($glyph: expr, $foreground_color: expr, $background_color: expr) => {

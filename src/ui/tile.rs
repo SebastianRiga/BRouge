@@ -294,7 +294,7 @@ impl Default for MapTile {
 
 impl Display for MapTile {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "MapTile(glyph: {:?}, kind: {:?}", self.glyph, self.kind)
+        write!(f, "({}, {})", self.glyph, self.kind)
     }
 }
 
@@ -340,8 +340,8 @@ pub enum MapTileType {
 impl Display for MapTileType {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            MapTileType::Floor => write!(f, "MapTileType::Floor"),
-            MapTileType::Wall => write!(f, "MapTileType::Wall"),
+            MapTileType::Floor => write!(f, "Floor"),
+            MapTileType::Wall => write!(f, "Wall"),
         }
     }
 }

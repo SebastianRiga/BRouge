@@ -65,7 +65,7 @@ use crate::js::local_storage;
 pub fn load_file(path: &str) -> String {
     let mut json = String::new();
 
-    bevy::log::info!("Loading file at: {}", path);
+    bevy::log::debug!("Loading file at: {}", path);
 
     std::fs::File::open(path)
         .unwrap_or_else(|error| {

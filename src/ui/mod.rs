@@ -30,6 +30,8 @@
 //!
 
 pub mod colors;
+pub mod game_map;
 pub mod rectangle;
 pub mod tile;
 pub mod tile_map;
+pub mod tile_map_layout_generator;

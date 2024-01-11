@@ -170,7 +170,7 @@ impl Display for WindowConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "WindowConfig(width: {:?}, height: {:?}, resizable: {:?}, position: {:?})",
+            "({}, {}, {}, {:?})",
             self.width,
             self.height,
             self.resizeable,

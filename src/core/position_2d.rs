@@ -19,8 +19,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use bevy::math::{IVec2, UVec2, Vec2};
 use std::fmt::Debug;
+
+use bevy::math::{IVec2, UVec2, Vec2};
 
 /// Describes a position in a two dimensional state, consisting of a `x` and `y``coordinate.
 ///
@@ -33,6 +34,10 @@ use std::fmt::Debug;
 /// * `[i32; 2]`
 /// * `[f32; 2]`
 /// * `[usize; 2]`
+/// * `(i32, i32)`
+/// * `(i32, i32)`
+/// * `(f32, f32)`
+/// * `(usize, usize)`
 ///
 /// # Examples
 ///
@@ -126,9 +131,20 @@ pub trait Position2d: Debug + Copy + Clone + PartialEq {
     fn as_array(&self) -> [i32; 2] {
         [self.x_coordinate(), self.y_coordinate()]
     }
+
+    ///
+    /// # About
+    ///
+    /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+    ///
+    /// Since: `0.1.9`
+    ///
+    fn as_tuple(&self) -> (i32, i32) {
+        (self.x_coordinate(), self.y_coordinate())
+    }
 }
 
-/// Internal macro to generate the [Position2d] trait implementations for existing types.
+/// Internal macro to generate the [Position2d] trait implementations for existing array index-able types.
 ///
 /// # About
 ///
@@ -140,7 +156,7 @@ pub trait Position2d: Debug + Copy + Clone + PartialEq {
 ///
 /// * [Position2d]
 ///
-macro_rules! implement_position_2d {
+macro_rules! implement_position_2d_for_array {
     ($type:ty) => {
         impl Position2d for $type {
             fn x_coordinate(&self) -> i32 {
@@ -154,13 +170,44 @@ macro_rules! implement_position_2d {
     };
 }
 
-implement_position_2d!(Vec2);
-implement_position_2d!(IVec2);
-implement_position_2d!(UVec2);
-implement_position_2d!([u32; 2]);
-implement_position_2d!([i32; 2]);
-implement_position_2d!([f32; 2]);
-implement_position_2d!([usize; 2]);
+implement_position_2d_for_array!(Vec2);
+implement_position_2d_for_array!(IVec2);
+implement_position_2d_for_array!(UVec2);
+implement_position_2d_for_array!([u32; 2]);
+implement_position_2d_for_array!([i32; 2]);
+implement_position_2d_for_array!([f32; 2]);
+implement_position_2d_for_array!([usize; 2]);
+
+/// Internal macro to generate the [Position2d] trait implementations for tuple types.
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.9`
+///
+/// # See also
+///
+/// * [Position2d]
+///
+macro_rules! implement_position_2d_for_tuple {
+    ($type:ty) => {
+        impl Position2d for $type {
+            fn x_coordinate(&self) -> i32 {
+                self.0 as i32
+            }
+
+            fn y_coordinate(&self) -> i32 {
+                self.1 as i32
+            }
+        }
+    };
+}
+
+implement_position_2d_for_tuple!((u32, u32));
+implement_position_2d_for_tuple!((i32, i32));
+implement_position_2d_for_tuple!((f32, f32));
+implement_position_2d_for_tuple!((usize, usize));
 
 #[cfg(test)]
 mod tests {
@@ -173,6 +220,10 @@ mod tests {
     const I32_ARRAY: [i32; 2] = [80, 50];
     const F32_ARRAY: [f32; 2] = [80.0f32, 50.0f32];
     const USIZE_ARRAY: [usize; 2] = [80usize, 50usize];
+    const U_TUPLE: (u32, u32) = (80u32, 50u32);
+    const I_TUPLE: (i32, i32) = (80, 50);
+    const F_TUPLE: (f32, f32) = (80.0f32, 50.0f32);
+    const USIZE_TUPLE: (usize, usize) = (80usize, 50usize);
 
     #[test]
     fn test_computed_properties() {
@@ -183,6 +234,10 @@ mod tests {
         assert_eq!(80, I32_ARRAY.x_coordinate());
         assert_eq!(80, F32_ARRAY.x_coordinate());
         assert_eq!(80, USIZE_ARRAY.x_coordinate());
+        assert_eq!(80, U_TUPLE.x_coordinate());
+        assert_eq!(80, I_TUPLE.x_coordinate());
+        assert_eq!(80, F_TUPLE.x_coordinate());
+        assert_eq!(80, USIZE_TUPLE.x_coordinate());
 
         assert_eq!(50, VEC2.y_coordinate());
         assert_eq!(50, I_VEC2.y_coordinate());
@@ -191,6 +246,10 @@ mod tests {
         assert_eq!(50, I32_ARRAY.y_coordinate());
         assert_eq!(50, F32_ARRAY.y_coordinate());
         assert_eq!(50, USIZE_ARRAY.y_coordinate());
+        assert_eq!(50, U_TUPLE.y_coordinate());
+        assert_eq!(50, I_TUPLE.y_coordinate());
+        assert_eq!(50, F_TUPLE.y_coordinate());
+        assert_eq!(50, USIZE_TUPLE.y_coordinate());
     }
 
     //noinspection ALL
@@ -203,5 +262,9 @@ mod tests {
         assert_eq!([80, 50], I32_ARRAY.as_array());
         assert_eq!([80, 50], F32_ARRAY.as_array());
         assert_eq!([80, 50], USIZE_ARRAY.as_array());
+        assert_eq!([80, 50], U_TUPLE.as_array());
+        assert_eq!([80, 50], I_TUPLE.as_array());
+        assert_eq!([80, 50], F_TUPLE.as_array());
+        assert_eq!([80, 50], USIZE_TUPLE.as_array());
     }
 }

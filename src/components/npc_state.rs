@@ -19,15 +19,49 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//! Exposes factories and functionality to create and manage all entities for the game.
-//!
-//! # About
-//!
-//! Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
-//!
-//! Since: `0.1.5`
-//!
+use std::fmt::{Debug, Display, Formatter};
 
-pub mod monster_factory;
-pub mod player_factory;
-pub mod terminal_factory;
+use bevy::prelude::Component;
+
+/// [Component] serving as the "memory" of an NPC, by preserving certain aspects of their surroundings
+/// and past events / interactions.
+///
+/// # Arguments
+///
+/// * `is_seeing_player`: Flag for storing if the `player entity` is currently in the `field of view´ of the
+/// NPC entity.
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.9`
+///
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Component)]
+pub struct NpcState {
+    pub is_seeing_player: bool,
+}
+
+impl Default for NpcState {
+    fn default() -> Self {
+        Self {
+            is_seeing_player: false,
+        }
+    }
+}
+
+impl Debug for NpcState {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ECS -> Component -> MonsterState {{ has_seen_player: {:?} }}",
+            self.is_seeing_player
+        )
+    }
+}
+
+impl Display for NpcState {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({:?})", self.is_seeing_player)
+    }
+}

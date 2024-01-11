@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9] Thu Jan 11 CET 2024
+
+Added first enemy entity and rendering logic for monsters, as well as line of sight system for monsters.
+
+### Added
+* [components/collision.rs](src/components/collision.rs) - Marker interface denoting the associated entity as
+  having collision, i.e. the player can't move onto the space occupied by the given entity.
+* [components/enemy_type.rs](src/components/enemy_type.rs) - `Component` for determining the type of an enemy. 
+  This can be used to differentiate between actions in certain systems.
+* [component/name_tag.rs](src/components/name_tag.rs) - A `Component` for naming the associated entity.
+* [component/npc_state.rs](src/components/npc_state.rs) - `Component` serving as the "memory" of an NPC,
+  by preserving certain aspects of their surroundings and past events / interactions.
+* [component/state_label.rs](src/components/state_label.rs) - Marker `Component` to associate entities with the
+  `GameStatePlugin`, which enables smaller queries through better bundling.
+* [entities/monster_factory.rs](src/entities/monster_factory.rs) -Factory defining the markup of enemy entities and
+  the handling of their creation logic.
+* [plugins/game_state_systems/mod.rs](src/plugins/game_state_systems/mod.rs) - Module providing all systems for the
+  `GameStatePlugin`
+* [plugin/game_state_systems/enemy_ai.rs](src/plugins/game_state_systems/enemy_ai.rs) - Computes the respective enemy's
+  reaction to the `player` entering or being inside their `field of view`.
+* [plugin/game_state_systems/lifecycle.rs::npc_turn_end_system](src/plugins/game_state_systems/lifecycle.rs) - Resets
+  the `GameTurnState` back to `GameTurnState::Player` after the `NPC entity systems` have run, giving
+  control back to the player.
+* [plugin/states.rs::GameTurnState](src/plugins/states.rs) - Defines a sub-state of the `AppState::Game`
+  to facilitate a turn-based logic for systems which are bound to the `players` action, e.g., the `player entity`
+  moves and other `NPC entities` respond to it by taking their respective turn.
+* [ui/tile_map_generator.rs](src/ui/tile_map_layout_generator.rs) - Trait implementation to separate generation of `TileMap`
+  layout from the `TileMap` implementors, i.e., the `GameMap` for better separation of concerns.
+
+### Changed
+* Cleaned up `Debug` and `Display` trait implementations for all `structs`
+* Extracted all `system functions` from `GameStatePlugin` and moved them to separate files in the new
+  `game_state_system` module.
+* [components/fov.rs](src/components/fov.rs) - Implemented functions to iterate contained position and check if
+  a position is contained in the `Fov`
+* [core/algorithm.rs](src/core/algorithm.rs) - Renamed file to `algorithm.rs` from `fov_algorithm.rs`
+* [core/dimension_2d.rs](src/core/dimension_2d.rs) - Added support for tuple types.
+* [core/position_2d.rs](src/core/position_2d.rs) - Added support for tuple types.
+* [ui/game_map.rs](src/ui/game_map.rs) - Moved to `ui` module for better bundling of logic and implemented usage
+  of the new `TileMapLayoutGenerator` trait.
+
+
+
+### Housekeeping
+* Updated `unit-tests.yml` for Github actions to also run unit tests when updating the `dev` branch
+* Cleaned up code
+* Added documentation and unit tests for `field of view` calculation
+
 ## [0.1.8] Sun Dec 31 EST 2023
 
 Cleaned up tile based UI and added unit tests, as well as documentation for the
@@ -17,13 +65,14 @@ new implementations.
 * [entities/terminal_factory.rs](src/entities/terminal_factory.rs) - Factory to create the tile and
   terminal based entities.
 * [ui](src/ui/mod.rs) - UI module to better separate responsibility for implementations in the code base.
-* [ui](src/ui/colors.rs) - Defines the color pallet and color scheme of the game.
-* [ui](src/ui/rectangle.rs) - Presents a two dimensional rectangular box in the cartesian coordinate system.
-* [ui](src/ui/tile.rs) - Renamed from `View` to better reflect its actual usage and moved more logic to base trait
-  implementation for better reuse-ability. Added standard `MapTile` and `MapTileType` implementation to reflect
-  standard floors and walls on the map.
-* [ui](src/ui/tile_map.rs) - Renamed from `ViewGroup` to better reflect its actual usage and moved it to its own file.
-  Moved most of the logic to the base trait implementation for better reuse-ability.
+* [ui/colors.rs](src/ui/colors.rs) - Defines the color pallet and color scheme of the game.
+* [ui/rectangle.rs](src/ui/rectangle.rs) - Presents a two dimensional rectangular box in the cartesian 
+  coordinate system.
+* [ui/tile.rs](src/ui/tile.rs) - Renamed from `View` to better reflect its actual usage and moved more logic 
+  to base trait implementation for better reuse-ability. Added standard `MapTile` and `MapTileType` implementation
+  to reflect standard floors and walls on the map.
+* [ui/tile_map.rs](src/ui/tile_map.rs) - Renamed from `ViewGroup` to better reflect its actual usage and moved it to
+  its own file. Moved most of the logic to the base trait implementation for better reuse-ability.
 
 ### Removed
 
@@ -43,7 +92,7 @@ Implemented room and corridor generation for the game map, as well as field of v
 
 * [components/fov.rs](src/components/fov.rs) - To provide a component which tracks the current field of view for the
   `player entity`. Interfaces with the `fov_algorithm::field_of_view` function for updates.
-* [core/fov_algorithm.rs](src/core/fov_algorithm.rs) - To calculate and update the player fov with the respective
+* [core/fov_algorithm.rs](src/core/algorithm) - To calculate and update the player fov with the respective
   systems and components.
 * [core/rectangle.rs](src/core/rectangle.rs) - To represent a rectangular room on the `GameMap`.
 * [core/rng.rs](src/core/rng.rs) - To provide a random number generator and classic D&D dice roller for the game.

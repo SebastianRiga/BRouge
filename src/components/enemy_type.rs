@@ -19,15 +19,30 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//! Exposes factories and functionality to create and manage all entities for the game.
-//!
-//! # About
-//!
-//! Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
-//!
-//! Since: `0.1.5`
-//!
+use bevy::prelude::Component;
 
-pub mod monster_factory;
-pub mod player_factory;
-pub mod terminal_factory;
+/// [Component] for determining the type of an enemy. This can be used to differentiate between actions in certain
+/// systems.
+///
+/// # Examples
+///
+/// ```
+/// commands.spawn((
+///     Coord2d::from_position(position),
+///     ascii_sprite!('m', Color::YELLOW),
+///     Fov::new(8),
+///     NameTag::new("Mended"),
+///     EnemyType::Mended // Marks the enemy as a "Mended".
+/// ));
+/// ```
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.9`
+///
+#[derive(Debug, Component)]
+pub enum EnemyType {
+    Mended,
+}

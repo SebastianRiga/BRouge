@@ -19,11 +19,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
 use bevy::prelude::Component;
 
-use crate::components::coord_2d::Coord2d;
 use crate::core::position_2d::Position2d;
 
 /// [Component] tracking the [Coord2d] based positions currently in the `field of view` of the associated `entity`.
@@ -39,14 +38,14 @@ use crate::core::position_2d::Position2d;
 ///
 /// Since: `0.1.7`
 ///
-#[derive(Debug, Clone, PartialEq, Component)]
+#[derive(Clone, Eq, PartialEq, Hash, Component)]
 pub struct Fov {
     /// The radius of the `field of view`.
     pub radius: i32,
     /// If the `field of view` needs to be recalculated.
     pub is_dirty: bool,
-    /// (Private) List of [Coord2d] based positions currently in the `field of view`.
-    coordinates: Vec<Coord2d>,
+    /// (Private) List of tuple based [Position2d]s currently in the `field of view`.
+    coordinates: Vec<(i32, i32)>,
 }
 
 impl Fov {
@@ -74,6 +73,17 @@ impl Fov {
         }
     }
 
+    ///
+    /// # About
+    ///
+    /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+    ///
+    /// Since: `0.1.9`
+    ///
+    pub fn positions(&self) -> &Vec<impl Position2d> {
+        &self.coordinates
+    }
+
     /// Adds the passed `position` to the [Fov], marking it as in the `field of view`
     /// of the associated `entity`.
     ///
@@ -90,7 +100,25 @@ impl Fov {
     /// Since: `0.1.7`
     ///
     pub fn push_position(&mut self, position: &impl Position2d) {
-        self.coordinates.push(Coord2d::from_position(position));
+        self.coordinates.push(position.as_tuple());
+    }
+
+    /// Checks if the passed [Position2d] is in the `field of view`.
+    ///
+    /// # Arguments
+    ///
+    /// * `position`: The position to check.
+    ///
+    /// returns: bool - `true` if the `position` is in the `field of view` and `false` otherwise.
+    ///
+    /// # About
+    ///
+    /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+    ///
+    /// Since: `0.1.9`
+    ///
+    pub fn contains(&self, position: &impl Position2d) -> bool {
+        self.coordinates.contains(&position.as_tuple())
     }
 
     /// Removes all [Coord2d]s currently in the field of view, making it empty.
@@ -106,12 +134,28 @@ impl Fov {
     }
 }
 
+impl Debug for Fov {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ECS -> Components -> Fov {{ \
+        radius: {:?}, \
+        is_dirty: {:?}, \
+        coordinates: {:?} \
+        }}",
+            self.radius, self.is_dirty, self.coordinates
+        )
+    }
+}
+
 impl Display for Fov {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "ECS -> Components -> Fov(radius: {:?}, is_dirty: {:?}, coordinates: {:?})",
-            self.radius, self.is_dirty, self.coordinates
+            "({}, {}, {})",
+            self.radius,
+            self.is_dirty,
+            self.coordinates.len()
         )
     }
 }

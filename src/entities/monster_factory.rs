@@ -21,43 +21,53 @@
 
 use std::fmt::{Debug, Display, Formatter};
 
-use bevy::prelude::Component;
+use bevy::prelude::{Color, Commands, Entity};
 
-/// Marker [Component] used to identify respective `entity` as the player / main actor of the game.
-///
-/// The resulting entity will be controllable by the player, fight monsters, end the game when it
-/// dies, etc.
-///
-/// # Examples
-///
-/// ```
-/// commands.spawn((
-///     Coord2d::from_position(starting_position),
-///     ascii_sprite!('@', Color::ORANGE, Color::BLACK)
-/// )).insert(Player); // The spawned `entity` will be the main actor of the game.
-/// ```
+use crate::ascii_sprite;
+use crate::components::collision::Collision;
+use crate::components::coord_2d::Coord2d;
+use crate::components::enemy_type::EnemyType;
+use crate::components::fov::Fov;
+use crate::components::name_tag::NameTag;
+use crate::components::npc_state::NpcState;
+use crate::components::state_label::GameStateLabel;
+use crate::core::position_2d::Position2d;
+
+/// Factory defining the markup of enemy entities and the handling of their creation logic.
 ///
 /// # About
 ///
 /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
 ///
-/// Since: `0.1.5`
+/// Since: `0.1.9`
 ///
-/// # See also
-///
-/// * [crate::entities::player_factory::PlayerFactory]
-///
-#[derive(Copy, Clone, Component)]
-pub struct Player;
+pub struct MonsterFactory;
 
-impl Debug for Player {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ECS -> Components -> Player {{ (Marker) }}")
+impl MonsterFactory {
+    pub fn spawn_mended(commands: &mut Commands, position: &impl Position2d) -> Entity {
+        commands
+            .spawn((
+                Coord2d::from_position(position),
+                ascii_sprite!('m', Color::YELLOW),
+                Fov::new(8),
+                NameTag::new("Mended"),
+                EnemyType::Mended,
+                NpcState::default(),
+                Collision,
+            ))
+            .insert(GameStateLabel)
+            .id()
     }
 }
 
-impl Display for Player {
+impl Debug for MonsterFactory {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Marker(Player)")
+        write!(f, "ECS -> Entities -> MonsterFactory")
+    }
+}
+
+impl Display for MonsterFactory {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "MonsterFactory")
     }
 }

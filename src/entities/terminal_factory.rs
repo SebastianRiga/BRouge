@@ -21,7 +21,7 @@
 
 use bevy::prelude::Commands;
 use bevy_ascii_terminal::{Terminal, TerminalBundle, TerminalFont, TileScaling, TiledCameraBundle};
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
 use crate::components::game_terminal::GameTerminal;
 use crate::core::dimension_2d::Dimension2d;
@@ -39,7 +39,6 @@ use crate::core::dimension_2d::Dimension2d;
 ///
 /// Since: `0.1.8`
 ///
-#[derive(Debug)]
 pub struct TerminalFactory;
 
 impl TerminalFactory {
@@ -77,8 +76,14 @@ impl TerminalFactory {
     }
 }
 
-impl Display for TerminalFactory {
+impl Debug for TerminalFactory {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "ECS -> Entities -> TerminalFactory")
+    }
+}
+
+impl Display for TerminalFactory {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "TerminalFactory")
     }
 }

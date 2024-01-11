@@ -19,15 +19,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//! Exposes factories and functionality to create and manage all entities for the game.
+//! Module providing all systems for the [super::game_state_plugin::GameStatePlugin].
 //!
 //! # About
 //!
 //! Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
 //!
-//! Since: `0.1.5`
+//! Since: `0.1.9`
 //!
 
-pub mod monster_factory;
-pub mod player_factory;
-pub mod terminal_factory;
+pub(super) mod enemy_ai;
+pub(super) mod fov;
+pub(super) mod graphics;
+pub(super) mod input;
+pub(super) mod lifecycle;

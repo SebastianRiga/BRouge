@@ -20,14 +20,15 @@
  */
 
 use bevy::app::{App, Plugin, PluginGroup, PreStartup};
+use bevy::log::{Level, LogPlugin};
 use bevy::prelude::{ClearColor, Commands, Res};
 use bevy::DefaultPlugins;
 use bevy_ascii_terminal::{TerminalFont, TerminalPlugin};
 
 use crate::entities::terminal_factory::TerminalFactory;
-use crate::plugins::app_state::AppState;
 use crate::plugins::game_state_plugin::GameStatePlugin;
 use crate::plugins::plugin_provider::PluginProvider;
+use crate::plugins::states::AppState;
 use crate::res::config_file::ConfigFile;
 use crate::res::input_config::InputConfig;
 use crate::res::window_config;
@@ -68,19 +69,26 @@ impl Plugin for BootstrapPlugin {
         // 3. Bootstrap systems
         // 4. States
         // 5. All other state plugins
-        app.add_plugins(DefaultPlugins.set(window_config.provide_plugin()))
-            .add_plugins(TerminalPlugin)
-            // Overwrite window clear color to set default background.
-            .insert_resource(ClearColor(colors::BACKGROUND))
-            .insert_resource(window_config)
-            .insert_resource(InputConfig::load())
-            .add_systems(PreStartup, startup_system)
-            .add_state::<AppState>()
-            .add_plugins(GameStatePlugin);
+        app.add_plugins(
+            DefaultPlugins
+                .set(window_config.provide_plugin())
+                .set(LogPlugin {
+                    level: Level::DEBUG,
+                    filter: "wgpu=error,naga=warn,bevy=info".into(),
+                }),
+        )
+        .add_plugins(TerminalPlugin)
+        // Overwrite window clear color to set default background.
+        .insert_resource(ClearColor(colors::BACKGROUND))
+        .insert_resource(window_config)
+        .insert_resource(InputConfig::load())
+        .add_systems(PreStartup, startup_system)
+        .add_state::<AppState>()
+        .add_plugins(GameStatePlugin);
     }
 
     fn name(&self) -> &str {
-        "BRouge: Bootstrapper"
+        "ECS -> Plugins -> Bootstrap"
     }
 
     fn is_unique(&self) -> bool {

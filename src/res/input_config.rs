@@ -211,7 +211,7 @@ impl Display for InputConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "InputConfig(up: {:?}, left: {:?}, down: {:?}, right: {:?}, cancel: {:?})",
+            "({:?}, {:?}, {:?}, {:?}, {:?})",
             self.up, self.left, self.down, self.right, self.cancel
         )
     }

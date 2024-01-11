@@ -29,8 +29,12 @@
 //!
 
 pub mod ascii_sprite;
+pub mod collision;
 pub mod coord_2d;
+pub mod enemy_type;
 pub mod fov;
-pub mod game_map;
 pub mod game_terminal;
+pub mod name_tag;
+pub mod npc_state;
 pub mod player;
+pub mod state_label;

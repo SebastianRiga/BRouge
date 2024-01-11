@@ -19,41 +19,79 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use bevy::prelude::States;
+use std::fmt::{Debug, Display, Formatter};
 
-/// Defines all states the game can be in, with every state representing an isolated and distinct logic section
-/// in the game's state machine.
+use bevy::prelude::Component;
+
+/// A [Component] for naming the associated entity.
 ///
-/// Every state has governance over its own entities, [bevy::prelude::Component]s, [bevy::prelude::Resource]s,
-/// and logic, e.g., one state might display the title screen with a specific main menu UI and music, while another
-/// state handle the main gameplay logic of the game.
+/// # Properties
 ///
-/// To facilitate this logic and separation, every [AppState] is coupled tightly with a respective
-/// [bevy::prelude::Plugin], which defines the states logic. The corresponding [bevy::prelude::Plugin] is only active
-/// when the state machine is in the coupled state.
+/// * `text`:
 ///
 /// # Examples
 ///
-/// See the [crate::plugins::game_state_plugin::GameStatePlugin] for an example implementation.
+/// ```
+/// commands.spawn((
+///     ...,
+///     NameTag::new("Player");
+///     ...,
+/// ));
+/// ```
 ///
 /// # About
 ///
 /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
 ///
-/// Since: `0.1.5`
+/// Since: `0.1.9`
 ///
-#[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Hash, States)]
-pub enum AppState {
-    /// The main gameplay state, in which the player actively travers the world and interacts with the game.
+#[derive(Clone, Eq, PartialEq, Hash, Component)]
+pub struct NameTag {
+    pub text: String,
+}
+
+impl NameTag {
+    /// Creates a new [NameTag] [Component] instance with passed `text`.
     ///
-    /// See the [crate::plugins::game_state_plugin::GameStatePlugin] for the corresponding [bevy::prelude::Plugin].
+    /// # Arguments
+    ///
+    /// * `text`: The name to use for the associated `entity`.
+    ///
+    /// returns: [NameTag]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let name_tag = NameTag::new("Player");
+    ///
+    /// assert_eq!("Player", name_tag.text);
+    /// ```
     ///
     /// # About
     ///
     /// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
     ///
-    /// Since: `0.1.5`
+    /// Since: `0.1.9`
     ///
-    #[default]
-    Game,
+    pub fn new(text: &str) -> Self {
+        Self {
+            text: String::from(text),
+        }
+    }
+}
+
+impl Debug for NameTag {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ECS -> Components -> NameTag {{ text: {:?} }}",
+            self.text
+        )
+    }
+}
+
+impl Display for NameTag {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({})", self.text)
+    }
 }

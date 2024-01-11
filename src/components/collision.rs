@@ -19,15 +19,44 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//! Exposes factories and functionality to create and manage all entities for the game.
-//!
-//! # About
-//!
-//! Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
-//!
-//! Since: `0.1.5`
-//!
+use std::fmt::{Debug, Display, Formatter};
 
-pub mod monster_factory;
-pub mod player_factory;
-pub mod terminal_factory;
+use bevy::prelude::Component;
+
+/// Marker interface denoting the associated entity as having collision, i.e. the player can't
+/// move onto the space occupied by the given entity.
+///
+/// # Examples
+///
+/// ```
+/// let entity = commands.spawn((
+///     Coord2d::from_position(position),
+///     ascii_sprite!('m', Color::YELLOW),
+///     Fov::new(8),
+///     NameTag::new("Mended"),
+///     EnemyType::Mended,
+///     NpcState::default(),
+///     Collision, // The spawned `entity` will block the space it occupies in the game's world.
+/// )).insert(GameStateLabel);
+/// ```
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.9`
+///
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Component)]
+pub struct Collision;
+
+impl Debug for Collision {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ECS -> Components -> Collision {{ (Marker) }}")
+    }
+}
+
+impl Display for Collision {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Marker(Collision)")
+    }
+}

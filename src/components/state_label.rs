@@ -19,15 +19,41 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//! Exposes factories and functionality to create and manage all entities for the game.
-//!
-//! # About
-//!
-//! Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
-//!
-//! Since: `0.1.5`
-//!
+use std::fmt::{Debug, Display, Formatter};
 
-pub mod monster_factory;
-pub mod player_factory;
-pub mod terminal_factory;
+use bevy::prelude::Component;
+
+/// Marker [Component] to associate entities with the [crate::plugins::game_state_plugin::GameStatePlugin], which
+/// enables smaller queries through better bundling.
+///
+/// # Examples
+///
+/// ```
+/// /// Logs all [NameTag] components for entities used in the [GameStatePlugin].
+/// fn log_system(names: Query<&NameTag, With<GameStateLabel>) {
+///     for name in names.iter() {
+///         debug!("{:?}", name);
+///     }
+/// }
+/// ```
+///
+/// # About
+///
+/// Authors: [Sebastian Riga](mailto:sebastian.riga.development@gmail.com)
+///
+/// Since: `0.1.9`
+///
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Component)]
+pub struct GameStateLabel;
+
+impl Debug for GameStateLabel {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ECS -> Components -> GameStateLabel {{ (Marker) }}")
+    }
+}
+
+impl Display for GameStateLabel {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Marker(GameStateLabel)")
+    }
+}

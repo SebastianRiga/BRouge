@@ -4,10 +4,10 @@ name: Unit tests
 on:
   push:
     # Runs on pushes targeting the default branch
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
     # Runs on opening pull requests targeting the default branch
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 env:
   CARGO_TERM_COLOR: always

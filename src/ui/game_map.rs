@@ -19,17 +19,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
 use bevy::prelude::Component;
 
-use crate::core::constants;
 use crate::core::dimension_2d::Dimension2d;
 use crate::core::position_2d::Position2d;
-use crate::core::rng::RandomNumberGenerator;
 use crate::ui::rectangle::Rectangle;
 use crate::ui::tile::{MapTile, Tile};
 use crate::ui::tile_map::TileMap;
+use crate::ui::tile_map_layout_generator::TileMapLayoutGenerator;
 
 /// A map making up a level of the game, which the `player` can traverse and explore.
 ///
@@ -62,20 +61,20 @@ use crate::ui::tile_map::TileMap;
 ///
 /// Since: `0.1.5`
 ///
-#[derive(Debug, Clone, Component)]
+#[derive(Clone, Component)]
 pub struct GameMap {
     /// The real width of the map.
     pub width: i32,
     /// The real height of the map.
     pub height: i32,
-    /// (Private) List of all rooms on the map in form of [Rectangle]s.
-    rooms: Vec<Rectangle>,
-    /// (Private) List of all tiles which make up the map as a linear vector.
-    tiles: Vec<MapTile>,
-    /// (Private) List of all tiles which the player has seen before, e.g., which were in his FOV at least once.
-    seen_tiles: Vec<bool>,
-    /// (Private) List of all tiles which the player currently sees, as defined by their FOV.
-    visible_tiles: Vec<bool>,
+    /// (Package-Private) List of all rooms on the map in form of [Rectangle]s.
+    pub(super) rooms: Vec<Rectangle>,
+    /// (Package-Private) List of all tiles which make up the map as a linear vector.
+    pub(super) tiles: Vec<MapTile>,
+    /// (Package-Private) List of all tiles which the player has seen before, e.g., which were in his FOV at least once.
+    pub(super) seen_tiles: Vec<bool>,
+    /// (Package-Private) List of all tiles which the player currently sees, as defined by their FOV.
+    pub(super) visible_tiles: Vec<bool>,
 }
 
 impl GameMap {
@@ -101,7 +100,7 @@ impl GameMap {
     ///
     /// Since: `0.1.5`
     ///
-    pub fn new(dimension: impl Dimension2d) -> Self {
+    pub fn new(dimension: &impl Dimension2d, generator: &impl TileMapLayoutGenerator) -> Self {
         let width = dimension.width();
         let height = dimension.height();
         let area = dimension.area();
@@ -115,35 +114,7 @@ impl GameMap {
             visible_tiles: vec![false; area],
         };
 
-        let mut rng = RandomNumberGenerator::new();
-
-        'rooms: for _ in 0..constants::MAP_MAX_ROOMS {
-            let room_width = rng.range(constants::MAP_MIN_ROOM_SIZE..=constants::MAP_MAX_ROOM_SIZE);
-            let room_height =
-                rng.range(constants::MAP_MIN_ROOM_SIZE..=constants::MAP_MAX_ROOM_SIZE);
-
-            let room = Rectangle::new(
-                [
-                    rng.roll_dice(1, width - room_width - 1) - 1,
-                    rng.roll_dice(1, height - room_height - 1) - 1,
-                ],
-                [room_width, room_height],
-            );
-
-            for existing_room in map.rooms.iter() {
-                if room.collides(existing_room) {
-                    continue 'rooms;
-                }
-            }
-
-            if !map.rooms.is_empty() {
-                let previous_room = map.rooms[map.rooms.len() - 1];
-                room.connect(&previous_room, &mut map);
-            }
-
-            room.add_to_map(&mut map);
-            map.rooms.push(room);
-        }
+        generator.generate_layout(&mut map);
 
         map
     }
@@ -177,24 +148,34 @@ impl GameMap {
     }
 }
 
-impl Display for GameMap {
+impl Debug for GameMap {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "ECS -> Components -> GameMap(\
+            "ECS -> Components -> GameMap {{\
             width: {:?}, \
             height: {:?}, \
             rooms: {:?}, \
             tiles: {:?}, \
             seen_tiles: {:?}, \
-            visible_tiles. {:?}\
-            )",
+            visible_tiles: {:?}\
+            }}",
+            self.width, self.height, self.rooms, self.tiles, self.seen_tiles, self.visible_tiles
+        )
+    }
+}
+
+impl Display for GameMap {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "({}, {}, {}, {}, {}, {})",
             self.width,
             self.height,
-            self.rooms,
-            self.tiles,
-            self.seen_tiles,
-            self.visible_tiles
+            self.rooms.len(),
+            self.tiles.len(),
+            self.seen_tiles.len(),
+            self.visible_tiles.len()
         )
     }
 }
