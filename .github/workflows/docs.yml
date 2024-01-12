@@ -49,7 +49,6 @@ jobs:
 
   # Deploy to Github pages
   deploy-docs:
-    if: false
     needs: build-docs
     environment:
       name: github-pages
